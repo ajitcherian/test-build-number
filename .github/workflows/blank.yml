@@ -39,9 +39,9 @@ jobs:
         run: |
           echo $GITHUB_RUN_NUMBER
           #echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
-          echo "this is output $GITHUB_OUTPUT"
-          echo "this is summary $GITHUB_STEP_SUMMARY"
-          echo "this is env $GITHUB_ENV"
+          cat $GITHUB_OUTPUT
+          cat $GITHUB_STEP_SUMMARY
+          cat $GITHUB_ENV
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
