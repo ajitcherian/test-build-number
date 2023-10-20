@@ -27,14 +27,17 @@ jobs:
         with:
           ref: ${{ github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Increment value
-        uses: yoic***REMOVED***ro/gh-action-increment-value@main
-        with:
-          target_directory: './'
-          target_file: 'build_number.json'
-          prefix: 'buildNumber":'
-          suffix: '}'
-          commit_message: 'Increment the build number to '      
+      #- name: Increment value
+      #  uses: yoic***REMOVED***ro/gh-action-increment-value@main
+      #  with:
+      #    target_directory: './'
+      #    target_file: 'build_number.json'
+      #    prefix: 'buildNumber":'
+      #    suffix: '}'
+      #    commit_message: 'Increment the build number to '      
+      - name: Increase build
+        run: |
+          echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
