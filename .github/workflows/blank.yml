@@ -38,9 +38,10 @@ jobs:
       - name: Increase build
         run: |
           echo $GITHUB_RUN_NUMBER
-          echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
-          export GITHUB_RUN_NUMBER=100
-          echo $GITHUB_RUN_NUMBER
+          #echo "### Hello world! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "t***REMOVED***s is output $GITHUB_OUTPUT"
+          echo "t***REMOVED***s is summary $GITHUB_STEP_SUMMARY"
+          echo "t***REMOVED***s is env $GITHUB_ENV"
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
