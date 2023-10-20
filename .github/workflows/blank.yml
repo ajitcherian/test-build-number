@@ -1,0 +1,40 @@
+# T***REMOVED***s is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run t***REMOVED***s workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  ***REMOVED***:
+    name: Increment value ***REMOVED***
+    runs-on: ubuntu-la***REMOVED***
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Check out source code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.YOUR_PERSONAL_ACCESS_TOKEN }}
+      - name: Increment value
+        uses: yoic***REMOVED***ro/gh-action-increment-value@main
+        with:
+          target_directory: './'
+          target_file: 'build_number.json'
+          prefix: 'buildNumber":'
+          suffix: '}'
+          commit_message: 'Increment the build number to '      
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo ***REMOVED***, and deploy your project.
