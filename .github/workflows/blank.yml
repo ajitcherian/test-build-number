@@ -37,7 +37,9 @@ jobs:
       #    commit_message: 'Increment the build number to '      
       - name: Increase build
         run: |
+          echo $GITHUB_RUN_NUMBER
           echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
+          eho $GITHUB_RUN_NUMBER_WITH_OFFSET
       - name: Run a multi-line script
         run: |
           echo Add other actions to build,
