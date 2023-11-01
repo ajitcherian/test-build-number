@@ -13,13 +13,18 @@ jobs:
     name: Increment value ***REMOVED***
     runs-on: ubuntu-la***REMOVED***
     steps:
-      - name: 'Set build id'
-        id: build_id 
-        run: | 
-          echo ${{ github.run_number }}
-          write-output $env:run_number
-          echo ${{ github.run_number }}
-        env:
-          run_number: 100
-        shell: pwsh
+      - name: Update workflow or runner number
+        uses: actions/github-script@v5
+        with:
+          script: |
+            // Get the current workflow run number
+            const workflowRunNumber = github.context.run_number;
+
+            // Update the workflow or runner number
+            github.repos.updateWorkflowRun({
+              repo: github.context.repo.name,
+              run_id: workflowRunNumber,
+              workflow_id: github.context.workflow.id,
+              runner_number: 100 || workflowRunNumber,
+            });
       
