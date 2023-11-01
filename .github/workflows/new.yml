@@ -17,12 +17,9 @@ jobs:
         id: build_id 
         run: | 
           echo ${{ github.run_number }}
-          echo ${{ github.build_number }}
-          write-output $env:build_number
           write-output $env:run_number
           echo ${{ github.run_number }}
-          echo ${{ github.build_number }}
         env:
-          build_number: 101
+          run_number: 100
         shell: pwsh
       
