@@ -4,12 +4,13 @@ runSQL() {
     set -ex
     isGetCount=true
     ls -la
-    #local result=$?
+    local result=$?
     if [ "$isGetCount" == "true" ]; then
         echo "$?"
     else
         if [ "$?" -eq 0 ]; then
             echo "Success"
+            return $result
         else
             echo "Failed"
         fi
