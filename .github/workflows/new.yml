@@ -14,9 +14,7 @@ jobs:
     steps:
       - name: 'Set build id'
         id: build_id
-        # add a step output `steps.build_id.outputs.id` as the unique id
         run: | 
-          echo "::set-output name=id::$(date +%s)"
-          export GITHUB_RUN_NUMBER="100" 
-          cat GITHUB_ENV
+          sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_ENV
+          cat $( echo $GITHUB_ENV )
       
