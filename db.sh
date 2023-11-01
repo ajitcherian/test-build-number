@@ -6,10 +6,11 @@ runSQL() {
     ls -la
     local result=$?
     if [ "$isGetCount" == "true" ]; then
-        echo "$?"
+        return $result
     else
-        if [ "$?" -eq 0 ]; then
+        if [ "$result" -eq 0 ]; then
             echo "Success"
+            echo "t***REMOVED***s is $result"
             return $result
         else
             echo "Failed"
