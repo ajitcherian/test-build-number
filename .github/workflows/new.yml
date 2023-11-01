@@ -17,4 +17,8 @@ jobs:
         run: | 
           echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
           env | grep GITHUB_RUN_NUMBER
+      - uses: mlilback/build-number@v1
+        with:
+          base: 100
+          run-id: ${GITHUB_RUN_NUMBER}    
       
