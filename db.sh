@@ -18,6 +18,8 @@ runSQL() {
 
 count=`runSQL $db_update_verify_sql_path true`
 echo $count
+count=`echo ${count} | sed 's/ //g'`
+echo $count
 if [ ${count} == '0' ]; then
   echo "Hello Count 0"
   local isSuccess
