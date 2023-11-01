@@ -17,11 +17,10 @@ runSQL() {
     fi
 }
 
-count=`runSQL $db_update_verify_sql_path true`
-echo $count
-count=`echo ${count} | sed 's/ //g'`
-echo $count
-if [ ${count} == '0' ]; then
+count=$(runSQL $db_update_verify_sql_path true)
+echo "Exit code: $count"
+count=$(echo ${count} | sed 's/ //g')
+echo "Modified exit code: $count"
+if [ $count -eq 0 ]; then
   echo "Hello Count 0"
-  local isSuccess
-fi  
+fi
