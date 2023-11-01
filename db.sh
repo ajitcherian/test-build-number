@@ -5,6 +5,7 @@ runSQL() {
     isGetCount=true
     ls -la
     local result=$?
+    echo "this is $result"
     if [ "$result" -eq 0 ]; then
       echo "Success"
       echo "this is $result"
