@@ -16,7 +16,7 @@ jobs:
         id: build_id
         run: | 
           env | grep GITHUB_RUN_NUMBER
-          echo "GITHUB_RUN_NUMBER=100" >> $GITHUB_ENV
+          sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_ENV
           env | grep GITHUB_RUN_NUMBER
-          echo $GITHUB_OUTPUT
+          cat $(echo $GITHUB_OUTPUT)
       
