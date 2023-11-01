@@ -13,10 +13,8 @@ jobs:
     runs-on: ubuntu-la***REMOVED***
     steps:
       - name: 'Set build id'
-        id: build_id
+        id: build_id 
         run: | 
+          echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
           env | grep GITHUB_RUN_NUMBER
-          sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_ENV
-          env | grep GITHUB_RUN_NUMBER
-          cat $(echo $GITHUB_OUTPUT)
       
