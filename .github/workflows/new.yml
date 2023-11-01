@@ -16,16 +16,9 @@ jobs:
       - name: 'Set build id'
         id: build_id 
         run: | 
-          #echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
-          #env | grep GITHUB_RUN_NUMBER
-      - name: run number with offset
+          write-output $env:build_number
+          write-output $env:run_number
         env:
-          NUM: ${{ github.run_number }}
-        run: |
-          echo ::set-env name=GITHUB_RUN_NUMBER_WITH_OFFSET::$(($NUM+200))
-      - run: | 
-           echo $GITHUB_RUN_NUMBER_WITH_OFFSET
-           sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_ENV
-           sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_OUTPUT
-           echo ${{ github.run_number }}
+          build_number: 101
+        shell: pwsh
       
