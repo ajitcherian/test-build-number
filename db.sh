@@ -5,16 +5,12 @@ runSQL() {
     isGetCount=true
     ls -la
     local result=$?
-    if [ "$isGetCount" == "true" ]; then
-        return $result
+    if [ "$result" -eq 0 ]; then
+      echo "Success"
+      echo "this is $result"
+      return $result
     else
-        if [ "$result" -eq 0 ]; then
-            echo "Success"
-            echo "this is $result"
-            return $result
-        else
-            echo "Failed"
-        fi
+      echo "Failed"
     fi
 }
 
