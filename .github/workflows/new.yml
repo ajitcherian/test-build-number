@@ -15,5 +15,8 @@ jobs:
       - name: 'Set build id'
         id: build_id
         run: | 
-          env
+          env | grep GITHUB_RUN_NUMBER
+          echo "GITHUB_RUN_NUMBER=100" >> $GITHUB_ENV
+          env | grep GITHUB_RUN_NUMBER
+          echo $GITHUB_OUTPUT
       
