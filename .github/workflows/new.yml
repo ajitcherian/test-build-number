@@ -15,8 +15,5 @@ jobs:
       - name: 'Set build id'
         id: build_id
         run: | 
-          cat $GITHUB_ENV
-          cat $GITHUB_OUTPUT
-          sed -i 's/GITHUB_RUN_NUMBER=.*/GITHUB_RUN_NUMBER=100/' $GITHUB_ENV
-          cat $GITHUB_ENV
+          env
       
