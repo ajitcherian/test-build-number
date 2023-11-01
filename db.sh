@@ -1,7 +1,7 @@
 #!/bin/bash
 # Function to run SQL scripts
 runSQL() {
-    #set -ex
+    set -ex
     isGetCount=true
     echo "hello"
     #local result=$?
@@ -17,6 +17,7 @@ runSQL() {
 }
 
 count=`runSQL $db_update_verify_sql_path true`
+echo $count
 if [ ${count} == '0' ]; then
   echo "Hello Count 0"
   local isSuccess
