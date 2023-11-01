@@ -17,14 +17,10 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            // Get the current workflow run number
-            const workflowRunNumber = github.context.run_number;
-
-            // Update the workflow or runner number
-            github.repos.updateWorkflowRun({
-              repo: github.context.repo.name,
-              run_id: workflowRunNumber,
-              workflow_id: github.context.workflow.id,
-              runner_number: 100 || workflowRunNumber,
-            });
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for reporting!'
+            })
       
