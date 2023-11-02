@@ -5,10 +5,12 @@ runSQL() {
     isGetCount=true
     output=`echo "hello"`
     local result=$?
+    echo $output
     #>/dev/null 2>&
 }
 
 count=$(runSQL $db_update_verify_sql_path true)
+echo $?
 echo "this is return value $count"
 #$count=$?
 #echo "Exit code: $count"
