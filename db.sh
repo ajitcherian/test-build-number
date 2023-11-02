@@ -5,6 +5,7 @@ runSQL() {
     isGetCount=true
     ls -la
     local result=$?
+    echo $result
     return $result
 }
 
