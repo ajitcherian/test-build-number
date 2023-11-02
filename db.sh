@@ -4,12 +4,12 @@ runSQL() {
     set -ex
     isGetCount=true
     echo "hello"
-    #local result=$?
-    return $?
+    local result=$?
+    echo "this is result $result"
 }
 
 count=$(runSQL $db_update_verify_sql_path true)
-
+echo $?
 echo "this is return value $count"
 #$count=$?
 #echo "Exit code: $count"
