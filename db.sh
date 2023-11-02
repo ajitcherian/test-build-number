@@ -4,12 +4,13 @@ runSQL() {
     set -ex
     isGetCount=true
     ls -la
-    local result=$?
-    echo $result
-    return $result
+    echo $?
+    return $?
 }
 
-count=$(runSQL $db_update_verify_sql_path true)
+runSQL $db_update_verify_sql_path true
+echo $?
+count=$?
 echo "Exit code: $count"
 count=$(echo ${count} | sed 's/ //g')
 echo "Modified exit code: $count"
