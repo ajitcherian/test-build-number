@@ -5,7 +5,7 @@ runSQL() {
     isGetCount=true
     echo "hello"
     local result=$?
-    return result
+    return $result
 }
 
 count=$(runSQL $db_update_verify_sql_path true)
