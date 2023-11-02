@@ -5,14 +5,7 @@ runSQL() {
     isGetCount=true
     ls -la
     local result=$?
-    echo "this is $result"
-    if [ "$result" -eq 0 ]; then
-      echo "Success"
-      echo "this is $result"
-      return $result
-    else
-      echo "Failed"
-    fi
+    return $result
 }
 
 count=$(runSQL $db_update_verify_sql_path true)
