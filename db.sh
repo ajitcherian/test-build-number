@@ -3,7 +3,7 @@
 runSQL() {
     set -ex
     isGetCount=true
-    output=`echo "hello"
+    output=`echo "hello"`
     #>/dev/null 2>&1
     #ls file2 >/dev/null 2>&1
     local result=$?
