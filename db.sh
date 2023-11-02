@@ -3,9 +3,9 @@
 runSQL() {
     set -ex
     isGetCount=true
-    echo "hello"
+    ls
     local result=$?
-    echo "t***REMOVED***s is result $result"
+    echo $?
 }
 
 count=$(runSQL $db_update_verify_sql_path true)
