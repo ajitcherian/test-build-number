@@ -1,21 +1,38 @@
-name: My workflow
+
+name: Deploy Workflow Master
+on:      
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: 'Environment to deploy to'
+        options:
+          - dev
+          - prod
+          - int
+          - qa
+          - qa2
+          - qa3
+          - qa4
+          - qa5
+          - qa6
+          - qa8
+          - prod-ecrnow
+          - prod-dr
+        required: true
+        default: 'dev' 
+
 env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-permissions: write-all  
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+  WORKFLOW_ID: "${{ github.run_id }}"
+
 jobs:
-  build_id:
-    name: Increment value ***REMOVED***
+  approval:
+    name: "Approval Stage for Master environment"
     runs-on: ubuntu-la***REMOVED***
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - run: |
-         chmod + db.sh
-         bash db.sh
-      
+      -
+        name: Get Code
+        run: |
+          echo ${{ env.ENV }}
+          echo ${{ env.WORKFLOW_ID }}
