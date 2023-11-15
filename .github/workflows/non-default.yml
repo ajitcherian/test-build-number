@@ -1,1 +1,15 @@
+name: Test
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: 'Environment to deploy to'
+        options:
+          - test
+        required: true
 
+env:
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+  WORKFLOW_ID: "${{ github.run_id }}"
