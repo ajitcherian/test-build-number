@@ -23,7 +23,7 @@ jobs:
       - name: "Check and Cancel Job"
         run: |
           echo ${{ env.ENV }}
-          echo $ env.CONFIG_FILE }} > application.txt
+          echo ${{ env.CONFIG_FILE }} > application.txt
       - uses: actions/upload-artifact@v3
         with:
           name: application.txt
