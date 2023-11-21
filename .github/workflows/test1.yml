@@ -1,0 +1,20 @@
+name: Test1
+  workflow_dispatch:
+    inputs:
+      branch-name:
+        type: choice
+        description: 'Environment to deploy to'
+        options:
+          - main
+        required: true
+        default: 'main'
+env:
+  BRANCH_NAME: "${{ github.event.inputs.branch-name }}"
+jobs:
+  test:
+    name: "Echo branch name"
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Print branch name
+        run: echo ${{ env.BRANCH_NAME }}
