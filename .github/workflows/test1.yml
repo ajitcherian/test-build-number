@@ -1,4 +1,4 @@
-name: Test1
+name: Test on Feature
 on:
   workflow_dispatch:
     inputs:
@@ -6,9 +6,9 @@ on:
         type: choice
         description: 'Environment to deploy to'
         options:
-          - main
+          - feature
         required: true
-        default: 'main'
+        default: 'feature'
 env:
   BRANCH_NAME: "${{ github.event.inputs.branch-name }}"
 jobs:
