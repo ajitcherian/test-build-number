@@ -1,4 +1,4 @@
-name: Test in main
+name: Common Name
 on:
   workflow_dispatch:
     inputs:
