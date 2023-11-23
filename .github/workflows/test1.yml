@@ -7,6 +7,7 @@ on:
         description: 'Environment to deploy to'
         options:
           - main
+          - prod-dr
         required: true
         default: 'main'
 env:
@@ -18,4 +19,15 @@ jobs:
     steps:
       -
         name: Print branch name
-        run: echo ${{ env.BRANCH_NAME }}
+        run: |
+          if [ "${{ github.event.inputs.branch-name }}" == "prod-dr" ]; then
+            export BRANCH_NAME="main"
+          fi
+          echo ${{ env.BRANCH_NAME }}
+  post:
+    name: "Post job"
+    runs-on: ubuntu-la***REMOVED***
+    steps:
+      -
+        name: Print branch name
+        run: echo ${{ env.BRANCH_NAME }}        
