@@ -23,6 +23,7 @@ jobs:
           if [ "${{ github.event.inputs.branch-name }}" == "prod-dr" ]; then
             export BRANCH_NAME="main"
           fi
+          echo $BRANCH_NAME
           echo ${{ env.BRANCH_NAME }}
   post:
     name: "Post job"
