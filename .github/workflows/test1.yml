@@ -25,7 +25,7 @@ jobs:
           host: ${{ secrets.DESTINATION_SERVER_HOST }}
           username: ${{ secrets.DESTINATION_SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: /home/runner/work/destination/destination/*.war 
+          source: ./deployment.war 
           target: /home/ec2-user/
           
       - name: Run script on destination server
