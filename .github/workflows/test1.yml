@@ -1,34 +1,47 @@
-name: Test in main
+name: Deploy to Server
+
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      branch-name:
-        type: choice
-        description: 'Environment to deploy to'
-        options:
-          - main
-          - prod-dr
-        required: true
-        default: 'main'
-env:
-  BRANCH_NAME: "${{ github.event.inputs.branch-name }}"
+
 jobs:
-  ***REMOVED***:
-    name: "Echo branch name"
+  deploy:
     runs-on: ubuntu-la***REMOVED***
+
     steps:
-      -
-        name: Print branch name
-        run: |
-          if [ "${{ github.event.inputs.branch-name }}" == "prod-dr" ]; then
-            export BRANCH_NAME="main"
-          fi
-          echo $BRANCH_NAME
-          echo ${{ env.BRANCH_NAME }}
-  post:
-    name: "Post job"
-    runs-on: ubuntu-la***REMOVED***
-    steps:
-      -
-        name: Print branch name
-        run: echo ${{ env.BRANCH_NAME }}        
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Copy files to destination server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DESTINATION_SERVER_HOST }}
+          username: ${{ secrets.DESTINATION_SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: /home/runner/work/destination/destination/*.war 
+          target: /home/ec2-user/
+          
+      - name: Run script on destination server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DESTINATION_SERVER_HOST }}
+          username: ${{ secrets.DESTINATION_SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ec2-user
+            ./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deployment deploy-file development.war  --name=lynx-dev.war --runtime-name=development.war  --disabled"
+
+            CURRENT_DEPLOYMENT=$(./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deployment-info --server-group=lynx-prod-fg_server-group" | grep enabled | awk '{print $1}')
+
+            ./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="undeploy --name=$CURRENT_DEPLOYMENT --server-groups=lynx-prod-fg_server-group --keep-content"
+
+            ./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="/server-group=lynx-prod-fg_server-group/deployment=$CURRENT_DEPLOYMENT:remove()"
+
+            ./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deploy --name=lynx-dev.war --server-groups=lynx-prod-fg_server-group"
