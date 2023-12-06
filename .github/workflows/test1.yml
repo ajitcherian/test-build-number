@@ -20,7 +20,7 @@ jobs:
            # Loop through each variable name and print it
            for var in $secret_names; do
                echo $var
-               echo "${{ secrets[$var] }}"
+               echo ${{ secrets[$var] }}
            done
       
 
