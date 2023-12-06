@@ -16,12 +16,15 @@ jobs:
         uses: actions/checkout@v2
       - run: |
            # Extracting variable names from the file
-           secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            # Loop through each variable name and print it
+           while IFS= read -r var; do
+            export $var
+           done < secrets.properties
+           secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            for var in $secret_names; do
-               echo $var
-               echo ${{ secrets[$var] }}
+               echo "$var=${!var}" >> test.txt
            done
+           
       
 
       - uses: actions/upload-artifact@v3
