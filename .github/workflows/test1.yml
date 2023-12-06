@@ -13,16 +13,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - run: echo "hello" > ***REMOVED***.txt
+      - run: |
+           # Extracting variable names from the file
+           secret_names=$(awk -F'=' '{print $1}' secrets.properties)
+           # Loop through each variable name and print it
+           for var in $secret_names; do
+               echo "$var"
+           done
 
-  ***REMOVED***:
-    runs-on: ubuntu-la***REMOVED***
-    needs: deploy
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - run: ls -la
       #- name: Setup SSH
       #  uses: webfactory/ssh-agent@v0.5.0
       #  with:
