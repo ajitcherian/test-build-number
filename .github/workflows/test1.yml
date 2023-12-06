@@ -20,7 +20,7 @@ jobs:
             var=$(echo "$line" | awk -F'=' '{print $1}')
             val=$(echo "$line" | awk -F'=' '{print $2}')
             
-            echo `$val` >>***REMOVED***.txt
+            echo "$var=`$val`" >>***REMOVED***.txt
 
            done < secrets.properties
            # Extracting variable names from the file
