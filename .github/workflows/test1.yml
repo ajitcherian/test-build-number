@@ -19,10 +19,8 @@ jobs:
            secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            # Loop through each variable name and print it
            for var in $secret_names; do
-               var=`echo $var`
-               echo "var=`echo ${var}`" >> $GITHUB_ENV
                echo $var
-               echo ${{ secrets[$var] }}
+               echo "${{ secrets[$var] }}"
            done
       
 
