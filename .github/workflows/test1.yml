@@ -22,7 +22,7 @@ jobs:
             
             echo `$val` >>***REMOVED***.txt
 
-           done <
+           done < secrets.properties
            # Extracting variable names from the file
            # Loop through each variable name and print it
            #w***REMOVED***le IFS= read -r var; do
