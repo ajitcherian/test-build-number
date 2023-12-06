@@ -22,15 +22,15 @@ jobs:
            #done < secrets.properties
            echo "Reading variables from file..."
            while IFS= read -r line; do
-            key=$(echo "$line" | awk -F'=' '{print $1}')
-            value=$(echo "$line" | awk -F'=' '{print $2}')
-            # Trim spaces from value
-            value="${value#"${value%%[![:space:]]*}"}"
-            value="${value%"${value##*[![:space:]]}"}"
-            # Remove the outer ${{ ... }} to get the secret value
-            value="${value#\$\{}"
-            value="${value%\}}"
-            export "$key=$value"
+             key=$(echo "$line" | awk -F'=' '{print $1}')
+             value=$(echo "$line" | awk -F'=' '{print $2}')
+             # Trim spaces from value
+             value="${value#"${value%%[![:space:]]*}"}"
+             value="${value%"${value##*[![:space:]]}"}"
+             # Remove the outer ${{ ... }} to get the secret value
+             value="${value#\$\{}"
+             value="${value%\}}"
+             export "$key=$value"
            done < secrets.properties
            secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            for var in $secret_names; do
