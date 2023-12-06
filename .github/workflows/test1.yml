@@ -5,7 +5,8 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
   deploy:
     runs-on: ubuntu-la***REMOVED***
