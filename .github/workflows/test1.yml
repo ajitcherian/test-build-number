@@ -15,25 +15,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - run: |
-           while IFS= read -r line; do
-            # Extract variable name and value using awk
-            var=$(echo "$line" | awk -F'=' '{print $1}')
-            val=$(echo "$line" | awk -F'=' '{print $2}')
-            echo $val
-            eval "echo $val"
-            #echo "$var=$val" >>test.txt
-
-           done < secrets.properties
-           # Extracting variable names from the file
-           # Loop through each variable name and print it
-           #while IFS= read -r var; do
-           # echo $var
-           #done < secrets.properties
-           #secret_name=$(awk -F'=' '{print $2}' secrets.properties)
-           #secret_value=$(awk -F'=' '{print $2}' secrets.properties)
-           #for var in $secret_names; do
-           #    echo "$var=${!var}" >> test.txt
-           #done
+           export var="DESTINATION_SERVER_HOST"
+           echo $var
+           echo ${{ secrets[env.vars] }}
            
       
 
