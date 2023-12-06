@@ -19,8 +19,11 @@ jobs:
            secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            # Loop through each variable name and print it
            for var in $secret_names; do
-               echo "${{ secrets[${var}] }}"
-               echo "$var" >> ***REMOVED***.txt
+               echo "SECRET_NAME = $var"
+               BUILD_SECRETS =${{ secrets[$SECRET_NAME] }}
+               echo "BUILD_SECRETS = $BUILD_SECRETS"
+               #echo "${{ secrets[${var}] }}"
+               #echo "$var" >> ***REMOVED***.txt
            done
       
 
