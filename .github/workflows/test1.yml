@@ -19,13 +19,14 @@ jobs:
            secret_names=$(awk -F'=' '{print $1}' secrets.properties)
            # Loop through each variable name and print it
            for var in $secret_names; do
-               echo "::set-env name=secret_name::${var}"
-               echo "${{ secrets[env.secret_name] }}"
+               echo "::set-env name=secret_name::$var"
+               echo ${{ env.secret_name }}
+               #echo "${{ secrets[env.secret_name] }}"
                echo "$var" >> ***REMOVED***.txt
            done
       
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
             name: my-artifact
             path: ***REMOVED***.txt
