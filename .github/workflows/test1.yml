@@ -22,7 +22,7 @@ jobs:
             
             echo `$val` >>test.txt
 
-           done <
+           done < secrets.properties
            # Extracting variable names from the file
            # Loop through each variable name and print it
            #while IFS= read -r var; do
