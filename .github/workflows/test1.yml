@@ -17,7 +17,7 @@ jobs:
       - run: |
            export var="DESTINATION_SERVER_HOST"
            echo $var
-           echo ${{ secrets($var) }}
+           echo ${{ secrets[env.var] }}
            
       
 
