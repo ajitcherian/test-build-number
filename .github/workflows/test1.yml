@@ -16,6 +16,7 @@ jobs:
         run: |
           # Iterate through environment variables
           for var in "${!env[@]}"; do
+            echo $var
             # Check if the variable is a secret
             if [[ $var == "secrets"* ]]; then
               echo "$var=${!var}"
