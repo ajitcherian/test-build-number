@@ -20,15 +20,17 @@ jobs:
           some_other_variable: foobar
           DESTINATION_SERVER_HOST: ${{ secrets.DESTINATION_SERVER_HOST }}
           DESTINATION_SERVER_USERNAME: ${{ secrets.DESTINATION_SERVER_USERNAME }}
-          file_name: secrets.properties
+          file_name: secrets.txt
           fail_on_empty: false
           sort_keys: false
           
-      - run: ls -la
-      - uses: actions/upload-artifact@v3
-        with:
-            name: my-artifact
-            path: secrets.properties
+      - run: | 
+         ls -la
+         cat secrets.txt
+      #- uses: actions/upload-artifact@v3
+      #  with:
+      #      name: my-artifact
+      #      path: secrets.txt
 
 
       #- name: Setup SSH
