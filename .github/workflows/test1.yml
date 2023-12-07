@@ -12,14 +12,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        id: version
-      - name: Set the value
-        id: step_one
+      - name: Print Secrets
         run: |
-            export DESTINATION_SERVER_HOST="DESTINATION_SERVER_HOST"
-            echo "${{ secrets.${DESTINATION_SERVER_HOST} }}" | envsubst
-      
-
+          # Iterate through environment variables
+          for var in "${!env[@]}"; do
+            # Check if the variable is a secret
+            if [[ $var == "secrets"* ]]; then
+              echo "$var=${!var}"
+            fi
+          done
+        env:
+          var1: var1
+          var2: var2
+          var3: var3
+          var4: ${{ secrets.DESTINATION_SERVER_HOST }}
+          var5: ${{ secrets.DESTINATION_SERVER_USERNAME }}
       #- uses: actions/upload-artifact@v3
       #  with:
       #      name: my-artifact
