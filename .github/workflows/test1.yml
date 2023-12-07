@@ -15,6 +15,7 @@ jobs:
       - name: Print Secrets
         run: |
           # Iterate through environment variables
+          echo ${!env[@]}
           for var in "${!env[@]}"; do
             echo $var
             # Check if the variable is a secret
