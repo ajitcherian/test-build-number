@@ -15,17 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         id: version
-      - run: |
-           export var="DESTINATION_SERVER_HOST"
-           echo $var
-           #echo "var=$(echo $var)" >> $GITHUB_ENV
-           echo "var=$(echo $var)" >> $GITHUB_OUTPUT
-           #echo ${{ secrets[env.var] }} > ***REMOVED***.txt
-
-      - name: Create Release
-        id: create_release
+      - name: Set the value
+        id: step_one
         run: |
-          echo ${{ secrets[steps.version.outputs.var] }} > ***REMOVED***.txt
+            echo "FOO=$(git status)" >> $GITHUB_ENV
+      - name: Use the value
+        id: step_two
+        run: |
+            echo "${{ env.FOO }}"
+            echo "${{ env.FOO }}" > ***REMOVED***.txt
       
 
       - uses: actions/upload-artifact@v3
