@@ -23,7 +23,7 @@ jobs:
         id: step_two
         run: |
             export DESTINATION_SERVER_HOST=DESTINATION_SERVER_HOST
-            echo `${{ secrets."$DESTINATION_SERVER_HOST" }}`
+            echo `${{ secrets.$DESTINATION_SERVER_HOST }}`
             echo "${{ env.FOO }}"
       
 
