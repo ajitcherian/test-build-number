@@ -21,6 +21,10 @@ jobs:
            #echo "var=$(echo $var)" >> $GITHUB_ENV
            #echo ${{ secrets[env.var] }} > test.txt
            echo '::set-output name=var::$var'
+
+     
+      - name: Echo old deployment before deploy
+        run: |
            echo ${{ steps.old-deployment-id.outputs.var }} > test.txt
       
 
