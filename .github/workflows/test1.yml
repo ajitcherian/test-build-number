@@ -21,13 +21,11 @@ jobs:
            #echo "var=$(echo $var)" >> $GITHUB_ENV
            echo "var=$(echo $var)" >> $GITHUB_OUTPUT
            #echo ${{ secrets[env.var] }} > ***REMOVED***.txt
-           echo '::set-output name=var::$var'
 
       - name: Create Release
         id: create_release
         run: |
-          echo ${{ steps.version.outputs.var }}
-          echo ${{ steps.version.outputs.var }} > ***REMOVED***.txt
+          echo ${{ secrets[steps.version.outputs.var] }} > ***REMOVED***.txt
       
 
       - uses: actions/upload-artifact@v3
