@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - run: mkdir kube
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0
         with:
@@ -20,17 +21,17 @@ jobs:
           some_other_variable: foobar
           envkey_DESTINATION_SERVER_HOST: ${{ secrets.DESTINATION_SERVER_HOST }}
           envkey_DESTINATION_SERVER_USERNAME: ${{ secrets.DESTINATION_SERVER_USERNAME }}
-          file_name: secrets.txt
+          file_name: kube/secrets.txt
           fail_on_empty: false
           sort_keys: false
           
       - run: | 
          ls -la
-         cat secrets.txt
+         cat kube/secrets.txt
       - uses: actions/upload-artifact@v3
         with:
             name: my-artifact
-            path: secrets.txt
+            path: kube/secrets.txt
 
 
       #- name: Setup SSH
