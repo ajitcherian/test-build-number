@@ -16,12 +16,13 @@ jobs:
       - name: Set the value
         id: step_one
         run: |
-            echo "FOO=hello" >> $GITHUB_ENV
-            echo "${{ env.FOO }}"
+            export var="hello"
+            echo "FOO=(echo $var)" >> $GITHUB_ENV
       - name: Use the value
         id: step_two
         run: |
-            echo "${{ env.FOO }}"
+            export var_name=FOO
+            echo "${{ env.$var_name }}"
             echo "${{ env.FOO }}" > test.txt
       
 
