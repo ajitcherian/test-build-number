@@ -14,13 +14,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        id: old-deployment-id
       - run: |
            export var="DESTINATION_SERVER_HOST"
            echo $var
-           echo "var=$(echo $var)" >> $GITHUB_ENV
-           echo ${{ secrets[env.var] }} > test.txt
-           echo ${{ env.var }}
-           
+           #echo "var=$(echo $var)" >> $GITHUB_ENV
+           #echo ${{ secrets[env.var] }} > test.txt
+           echo '::set-output name=var::$var'
+           echo ${{ steps.old-deployment-id.outputs.var }}
       
 
       - uses: actions/upload-artifact@v3
