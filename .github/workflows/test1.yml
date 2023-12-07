@@ -17,7 +17,7 @@ jobs:
       - run: |
            export var="DESTINATION_SERVER_HOST"
            echo $var
-           echo "var=$(echo $var") >> $GITHUB_ENV
+           echo "var=$(echo $var)" >> $GITHUB_ENV
            echo ${{ secrets[env.var] }}
            
       
