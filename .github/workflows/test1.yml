@@ -14,15 +14,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Print Secrets
         run: |
-          # Iterate through environment variables
-          echo ${!env[@]}
-          for var in "${!env[@]}"; do
-            echo $var
-            # Check if the variable is a secret
-            if [[ $var == "secrets"* ]]; then
-              echo "$var=${!var}"
-            fi
-          done
+          env | grep '^secrets\.' | cut -d= -f1 | tr '\n' ',' | sed 's/,$//'
         env:
           var1: var1
           var2: var2
