@@ -5,8 +5,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 jobs:
   deploy:
     runs-on: ubuntu-la***REMOVED***
@@ -18,7 +16,7 @@ jobs:
       - name: Set the value
         id: step_one
         run: |
-            echo "FOO=$(git status)" >> $GITHUB_ENV
+            echo "FOO=hello" >> $GITHUB_ENV
       - name: Use the value
         id: step_two
         run: |
