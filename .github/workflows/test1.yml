@@ -18,8 +18,8 @@ jobs:
           envkey_DEBUG: false
           envkey_SOME_API_KEY: "123456abcdef"
           some_other_variable: foobar
-          DESTINATION_SERVER_HOST: ${{ secrets.DESTINATION_SERVER_HOST }}
-          DESTINATION_SERVER_USERNAME: ${{ secrets.DESTINATION_SERVER_USERNAME }}
+          envkey_DESTINATION_SERVER_HOST: ${{ secrets.DESTINATION_SERVER_HOST }}
+          envkey_DESTINATION_SERVER_USERNAME: ${{ secrets.DESTINATION_SERVER_USERNAME }}
           file_name: secrets.txt
           fail_on_empty: false
           sort_keys: false
@@ -27,10 +27,10 @@ jobs:
       - run: | 
          ls -la
          cat secrets.txt
-      #- uses: actions/upload-artifact@v3
-      #  with:
-      #      name: my-artifact
-      #      path: secrets.txt
+      - uses: actions/upload-artifact@v3
+        with:
+            name: my-artifact
+            path: secrets.txt
 
 
       #- name: Setup SSH
