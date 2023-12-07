@@ -16,8 +16,8 @@ jobs:
       - name: Set the value
         id: step_one
         run: |
-            export var="DESTINATION_SERVER_HOST"
-            echo "hello=$DESTINATION_SERVER_HOST" | envsubst
+            export DESTINATION_SERVER_HOST="DESTINATION_SERVER_HOST"
+            echo "hello=${DESTINATION_SERVER_HOST}" | envsubst
             #echo "DESTINATION_SERVER_HOST=DESTINATION_SERVER_HOST" >> $GITHUB_ENV
             #echo "FOO=(echo $var)" >> $GITHUB_ENV
       - name: Use the value
