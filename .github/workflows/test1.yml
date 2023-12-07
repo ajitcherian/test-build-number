@@ -19,6 +19,7 @@ jobs:
            echo $var
            echo "var=$(echo $var)" >> $GITHUB_ENV
            echo ${{ secrets[env.var] }} > ***REMOVED***.txt
+           echo ${{ env.var }}
            
       
 
