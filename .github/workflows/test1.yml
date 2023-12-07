@@ -18,7 +18,7 @@ jobs:
            export var="DESTINATION_SERVER_HOST"
            echo $var
            echo "var=$(echo $var)" >> $GITHUB_ENV
-           echo ${{ secrets[env.var] }}
+           echo ${{ secrets[env.var] }} > ***REMOVED***.txt
            
       
 
