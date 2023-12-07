@@ -22,7 +22,7 @@ jobs:
         id: step_two
         run: |
             export var_name=FOO
-            echo "${{ env.$var_name }}"
+            echo "${{ env[$var_name] }}"
             echo "${{ env.FOO }}" > test.txt
       
 
