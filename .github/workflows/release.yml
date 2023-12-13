@@ -1,0 +1,43 @@
+name: POC
+on:      
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'TAG_NUMBER'
+        required: true
+        type: choice
+        default: "lynx-web-0.1020.release_lynx-RELEASE_6.13.4"
+        options:
+          - test-build-number-master-2023-12-04-080835-580
+          - test-build-number-releases-1.1.0-2023-12-04-080835-582
+          - test-build-number-releases-1.6.0-2023-12-04-080835-583
+          - test-build-number-releases-3.1.0-2023-12-04-080835-584
+      restart-controllers:
+        type: boolean
+        required: true
+        default: false
+
+env:
+  TAG_NUMBER: "${{ github.event.inputs.release-version }}"
+  DATABASE_UPDATE: "${{ github.event.inputs.database-update }}"
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+
+jobs:
+  First_Workflow:
+    name: "Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Running Commands
+        run: |
+          PROJECT_NAME=$(basename $GITHUB_REPOSITORY)
+          echo $PROJECT_NAME
+          echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
+          input="${{ env.TAG_NUMBER}}"
+          if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+            BRANCH_NAME="${BASH_REMATCH[1]}"
+            echo $BRANCH_NAME
+            echo "releaseNumber=`echo ${BRANCH_NAME} | cut -d- -f 2`" >> $GITHUB_ENV     
+          fi
+          echo $releaseNumber
