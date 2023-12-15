@@ -25,8 +25,8 @@ jobs:
       - name: Print false
         if: ${{ githuh.events.inputs.restart-controllers }} == false
         run: | 
-          echo "this is ${{ githuh.events.inputs.restart-controllers }}"
+          echo "this is ${{ github.events.inputs.restart-controllers }}"
       - name: Print true
         if: ${{ githuh.events.inputs.restart-controllers }} == true
         run: | 
-          echo "this is ${{ githuh.events.inputs.restart-controllers }}"
+          echo "this is ${{ github.events.inputs.restart-controllers }}"
