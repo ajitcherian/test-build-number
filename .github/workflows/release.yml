@@ -23,10 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print false
-        if: ${{ githuh.events.inputs.restart-controllers }} == false
+        if: ${{ github.events.inputs.restart-controllers }} == false
         run: | 
           echo "this is ${{ github.events.inputs.restart-controllers }}"
       - name: Print true
-        if: ${{ githuh.events.inputs.restart-controllers }} == true
+        if: ${{ github.events.inputs.restart-controllers }} == true
         run: | 
           echo "this is ${{ github.events.inputs.restart-controllers }}"
