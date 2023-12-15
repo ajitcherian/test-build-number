@@ -17,7 +17,7 @@ on:
         required: true
         default: false
 env: 
-  FOO: ${{ ! github.events.inputs.restart-controllers }}
+  FOO: ${{ github.events.inputs.restart-controllers }}
 jobs:
   First_Workflow:
     name: "Test"
