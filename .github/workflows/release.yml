@@ -16,17 +16,18 @@ on:
         type: boolean
         required: true
         default: false
-
+env: 
+  FOO: ${{ ! github.events.inputs.restart-controllers }}
 jobs:
   First_Workflow:
     name: "Test"
     runs-on: ubuntu-latest
     steps:
       - name: Print false
-        if: ${{ github.events.inputs.restart-controllers }} == false
+        if: ${{ ! github.events.inputs.restart-controllers }}
         run: | 
-          echo "this is ${{ github.events.inputs.restart-controllers }}"
+          echo "this is ${{ env.FOO }}"
       - name: Print true
-        if: ${{ github.events.inputs.restart-controllers }} == true
+        if: ${{ github.events.inputs.restart-controllers }}
         run: | 
-          echo "this is ${{ github.events.inputs.restart-controllers }}"
+          echo "this is ${{ env.FOO }}"
