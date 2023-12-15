@@ -13,21 +13,20 @@ on:
           - ***REMOVED***-build-number-releases-1.6.0-2023-12-04-080835-583
           - ***REMOVED***-build-number-releases-3.1.0-2023-12-04-080835-584
       restart-controllers:
-        type: boolean
-        required: true
-        default: false
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+          
 env: 
-  FOO: ${{ github.events.inputs.restart-controllers }}
+  ENV1: qa
+  ENV2: prod
 jobs:
   First_Workflow:
     name: "Test"
     runs-on: ubuntu-la***REMOVED***
     steps:
-      - name: Print false
-        if: ${{ ! github.events.inputs.restart-controllers }}
-        run: | 
-          echo "t***REMOVED***s is ${{ env.FOO }}"
       - name: Print true
-        if: ${{ github.events.inputs.restart-controllers }}
+        if: ${{ env.ENV1 != 'true' }} && ${{ env.ENV2 != 'prod'}}        
         run: | 
-          echo "t***REMOVED***s is ${{ env.FOO }}"
+          echo "t***REMOVED***s is true"
