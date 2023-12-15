@@ -17,26 +17,16 @@ on:
         required: true
         default: false
 
-env:
-  TAG_NUMBER: "${{ github.event.inputs.release-version }}"
-  DATABASE_UPDATE: "${{ github.event.inputs.database-update }}"
-  ENV: "${{ github.event.inputs.deploy-environment }}"
-
 jobs:
   First_Workflow:
     name: "Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Running Commands
-        run: |
-          PROJECT_NAME=$(basename $GITHUB_REPOSITORY)
-          echo $PROJECT_NAME
-          echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
-          input="${{ env.TAG_NUMBER}}"
-          if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
-            releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
-            echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV
-          fi
-          echo $releaseNumber
+      - name: Print false
+        if: ${{ githuh.events.inputs.restart-controllers }} == false
+        run: | 
+          echo "this is ${{ githuh.events.inputs.restart-controllers }}"
+      - name: Print true
+        if: ${{ githuh.events.inputs.restart-controllers }} == true
+        run: | 
+          echo "this is ${{ githuh.events.inputs.restart-controllers }}"
