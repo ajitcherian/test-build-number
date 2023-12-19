@@ -27,3 +27,4 @@ jobs:
         with:
           name: my-artifact
           path: secrets.properties
+          
