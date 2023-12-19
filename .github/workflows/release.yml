@@ -1,32 +1,29 @@
 name: POC
 on:      
-  workflow_dispatch:
-    inputs:
-      release-version:
-        description: 'TAG_NUMBER'
-        required: true
-        type: choice
-        default: "lynx-web-0.1020.release_lynx-RELEASE_6.13.4"
-        options:
-          - ***REMOVED***-build-number-master-2023-12-04-080835-580
-          - ***REMOVED***-build-number-releases-1.1.0-2023-12-04-080835-582
-          - ***REMOVED***-build-number-releases-1.6.0-2023-12-04-080835-583
-          - ***REMOVED***-build-number-releases-3.1.0-2023-12-04-080835-584
-      restart-controllers:
-        type: choice
-        options:
-          - 'false'
-          - 'true'
+  push:
+    branches: 
+    - main
           
-env: 
-  ENV1: qa
-  ENV2: prod
 jobs:
   First_Workflow:
     name: "Test"
     runs-on: ubuntu-la***REMOVED***
+    environment: dev
     steps:
-      - name: Print true
-        if: ${{ env.ENV1 != 'true' }} && ${{ env.ENV2 != 'prod'}}        
+      - name: "Make secret file"
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          # Add variable name with prefix "envkey_<VARIABLE-NAME>".
+          envkey_USER1: ${{ secrets.USER1 }}
+          envkey_USER2: ${{ secrets.USER2 }}
+          # Below are variable for the module
+          file_name: secrets.properties
+          fail_on_empty: false
+          sort_keys: false
+      - name: Print true  
         run: | 
-          echo "t***REMOVED***s is true"
+          cat secrets.properties
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: secrets.properties
