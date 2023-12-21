@@ -53,6 +53,6 @@ jobs:
     environment: dev
     steps:
         - name: PROD | Start Master Host Controllers
-          if: (${{ github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' }}) || (${{ github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' }})  # Need to add one more condition
+          if: ${{ github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' }} || ${{ github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' }}  # Need to add one more condition
           run: | 
             echo "Choice work"
