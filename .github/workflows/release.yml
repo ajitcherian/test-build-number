@@ -1,8 +1,48 @@
 name: POC
 on:      
-  push:
-    branches: 
-    - main
+  workflow_dispatch:
+    inputs:
+      database-update:
+        description: 'Select the environment if a database update needed. If not then select "false".'
+        type: choice
+        required: false
+        default: 'false'
+        options:
+          - 'false'
+          - LMDA
+          - LMDB
+          - LMDC
+          - LYNXDEV
+          - LMPERF
+          - LYNXQA1
+          - LYNXALPHA
+          - LYNXPERF
+          - LYNXPREVIEW
+          - LYNXQA
+
+      deploy-environment:
+        type: choice
+        description: 'Choose environment'
+        options:
+          - qa
+          - alpha
+          - perf
+          - preview
+          - prod
+        required: true
+        default: 'qa'
+
+      restart-controllers:
+        type: boolean
+        required: true
+        default: false
+
+      only-copy-property-file:
+        type: choice
+        required: true
+        options:
+          - 'false'
+          - 'true'
           
 jobs:
   First_Workflow:
@@ -10,21 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     steps:
-      - name: "Make secret file"
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          # Add variable name with prefix "envkey_<VARIABLE-NAME>".
-          envkey_USER1: ${{ secrets.USER1 }}
-          envkey_USER2: ${{ secrets.USER2 }}
-          # Below are variable for the module
-          file_name: secrets.properties
-          fail_on_empty: false
-          sort_keys: false
-      - name: Print true  
-        run: | 
-          cat secrets.properties
-      - uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          path: secrets.properties
-          
+        - name: PROD | Start Master Host Controllers
+          if: (${{ github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' }}) || ${{ github.event.inputs.restart-controllers == 'true'  }} # Need to add one more condition
+          run: | 
+            echo "Choice work"
