@@ -1,0 +1,111 @@
+name: "POC | Final Deployment Workflow"
+
+on:      
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'TAG_NUMBER'
+        required: true
+        type: choice
+        default: "lynx-releases-6.2.2-2023-12-04-080835-02"
+        options:
+          - lynx-releases-6.14.2-2023-12-04-080835-02
+          - lynx-releases-6.14.1-2023-12-04-080835-02
+          - lynx-releases-6.2.2-2023-12-04-080835-02
+          - lynx-releases-6.2.1-2023-12-04-080835-01
+          - lynx-releases-6.13.4-2023-12-04-080835-589
+          - lynx-releases-1.1.0-2023-12-04-080835-581
+          - lynx-releases-1.1.3-2023-12-04-080835-582
+          - lynx-releases-1.1.3-2023-12-04-080835-582
+
+      database-update:
+        description: 'Select the environment if a database update needed. If not then select "false".'
+        type: choice
+        required: false
+        default: 'false'
+        options:
+          - 'false'
+          - LMDA
+          - LMDB
+          - LMDC
+          - LYNXDEV
+          - LMPERF
+          - LYNXQA1
+          - LYNXALPHA
+          - LYNXPERF
+          - LYNXPREVIEW
+          - LYNXQA
+
+      deploy-environment:
+        type: choice
+        description: 'Choose environment'
+        options:
+          - qa
+          - alpha
+          - perf
+          - preview
+          - prod
+        required: true
+        default: 'qa'
+
+      database-rollback:
+        type: choice
+        required: true
+        options:
+          - 'false'
+          - 'true'
+
+env:
+  TAG_NUMBER: "${{ github.event.inputs.release-version }}"
+  DATABASE_UPDATE: "${{ github.event.inputs.database-update }}"
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+  # Lynx artifactory path
+  JSON_VARIABLE: "${{ secrets[github.event.inputs['database-update']] }}"
+  PROJECT_NAME: "lynx"
+jobs:
+    prerequisite:
+      name: "Preparing Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+      environment: ${{ github.event.inputs.deploy-environment }}
+      runs-on: ubuntu-la***REMOVED***   #kube-deploy
+      defaults:
+        run:
+          shell: bash
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v2
+          #with:
+            #fetch-tags: 'true'
+            #ref: ${{ github.event.inputs.release-version }}
+
+        - name: Set Variables
+          run: |
+            # If release name has release/FHIR it will modify it to release-FHIR.
+            PROJECT_NAME="lynx"
+            echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
+            input="${{ env.TAG_NUMBER}}"
+            if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+              BRANCH_NAME=$(echo "${BASH_REMATCH[1]}" | sed 's/\//-/g')
+              echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV 
+            else
+              echo "Invalid input format: $input"
+            fi
+            echo $PROJECT_NAME $BRANCH_NAME
+
+    dbdeploy:
+      name: "Deploy to ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+      environment: ${{ github.event.inputs.deploy-environment }}
+      runs-on: ubuntu-la***REMOVED***
+      if: ${{ always() && !failure() && !cancelled() }}
+      needs: [prerequisite]
+      defaults:
+        run:
+          shell: bash
+      steps:
+        - name: Database Rollback
+          if: ${{ github.event.inputs.database-update != 'false' && github.event.inputs.database-rollback == 'true' }} 
+          run: |
+            echo "Running Rollback DB Scripts"
+        - name: Database Rollback
+          if: ${{ github.event.inputs.database-update != 'false' &&  github.event.inputs.database-rollback == 'false' }}
+          run: |
+              echo "Running DB Scripts"
