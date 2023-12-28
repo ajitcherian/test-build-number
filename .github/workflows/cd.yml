@@ -156,7 +156,11 @@ jobs:
         #     name: war_and_property_file
         #     path: ${{ env.WORKFLOW_FOLDER_NAME }}
         #     retention-days: 1
-
+        - name: Cache Primes
+          id: cache-primes
+          uses: actions/cache@v3
+          with:
+             path: ${{ env.WORKFLOW_FOLDER_NAME }}
 
     deploy:
       name: "Deploy to ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
@@ -178,7 +182,15 @@ jobs:
 
         - name: PROD | Stop Server Group and All Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
-          run: echo "PROD | Stop Server Group and All Host Controllers"
+          run: | 
+              # Replace commas with spaces to create an array
+              IFS=', ' read -r -a controllers <<< "echo ${{ vars.CONTROLLER_NAMES }}"
+
+              # Loop through the array of controller names
+              for controller in "${controllers[@]}"; do
+                  echo "Controller name: $controller"
+              done
+              echo "PROD | Stop Server Group and All Host Controllers"
           
         - name: Checkout Repository of Database File
           if: ${{ github.event.inputs.database-update != 'false' }}
@@ -207,7 +219,12 @@ jobs:
             fi
             echo "Relase Number is: $releaseNumber"
             echo "Run Database Update Command"
-
+         
+        # - uses: actions/cache/restore@v3
+        #   id: restore-build
+        #    with:
+        #   path: ${{ github.workspace }}/your-folder-to-cache
+          
         - name: Set java and maven
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: echo "Install mvn"
@@ -218,8 +235,8 @@ jobs:
 
         - name: PROD | Start Master Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
-          run: echo "PROD | Start Master Host Controllers" && ls -la lynx-web && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
-              
+          run: echo "PROD | Start Master Host Controllers" 
+          
         - name: PROD | Start Slave1 Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
           run: echo "PROD | Start Slave1 Host Controllers"
