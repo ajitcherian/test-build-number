@@ -214,7 +214,7 @@ jobs:
 
         - name: PROD | Start Master Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
-          run: echo "PROD | Start Master Host Controllers" && ls -lh $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}
+          run: echo "PROD | Start Master Host Controllers" && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
               
         - name: PROD | Start Slave1 Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
