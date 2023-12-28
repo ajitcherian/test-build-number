@@ -115,11 +115,11 @@ jobs:
         #Generate and copy property file to server
         - name: Set application properties file
           run: |
-            mkdir -p $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}
-            echo ${{ vars.APPLICATION_PROPERTIES }} >> $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
-            echo `cat secrets.properties` >> $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
-            echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
-            ls -lh $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}
+            mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
+            echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
+            echo `cat secrets.properties` >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
+            echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
+            ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
 
         - name: Set Credentials for Jfrog Artifact
           if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
@@ -147,6 +147,12 @@ jobs:
         - name: Undeploy to WildFly
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: echo "Undeploy on lower env"
+        - name: Upload math result for job 2
+          uses: actions/upload-artifact@v3
+          with:
+            name: war_and_property_file
+            path: ${{ env.WORKFLOW_FOLDER_NAME }}
+            retention-days: 1
 
 
     deploy:
@@ -174,6 +180,10 @@ jobs:
         - name: Checkout Repository of Database File
           #if: ${{ github.event.inputs.database-update != 'false' }}
           uses: actions/checkout@v2
+        - name: Download Artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: war_and_property_file
 
         - name: Database Changes
           if: ${{ github.event.inputs.database-update != 'false' }}
