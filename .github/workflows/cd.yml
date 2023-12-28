@@ -172,7 +172,7 @@ jobs:
           run: echo "PROD | Stop Server Group and All Host Controllers"
           
         - name: Checkout Repository of Database File
-          if: ${{ github.event.inputs.database-update != 'false' }}
+          #if: ${{ github.event.inputs.database-update != 'false' }}
           uses: actions/checkout@v2
 
         - name: Database Changes
