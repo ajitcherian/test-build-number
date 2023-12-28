@@ -79,7 +79,10 @@ jobs:
       runs-on: ubuntu-latest
       defaults:
         run:
-          shell: bash
+          shell: bash 
+      container:
+        image: mehulsharma20/sqlplus:v7
+        options: --user root    
       steps:
         - name: Checkout repository
           uses: actions/checkout@v2
@@ -161,20 +164,6 @@ jobs:
         #   uses: actions/cache@v3
         #   with:
         #      path: ${{ env.WORKFLOW_FOLDER_NAME }}
-
-    deploy:
-      name: "Deploy to ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-latest
-      if: ${{ always() && !failure() && !cancelled() }}
-      needs: [prerequisite]
-      defaults:
-        run:
-          shell: bash
-      container:
-        image: mehulsharma20/sqlplus:v7
-        options: --user root
-      steps:
         - name: Silence Alerts
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
@@ -185,30 +174,12 @@ jobs:
           run: | 
               # Replace commas with spaces to create an array
               IFS=',' read -r -a controllers <<< `echo "${{ vars.CONTROLLER_NAMES }}"`              
-              # Initialize variables to store controllers with and without 'master'
-              no_master_controllers=()
-              master_controller=""
 
               # Loop through the array of controller names
               for controller in "${controllers[@]}"; do
-                  if [[ "$controller" == *"master"* ]]; then
-                      master_controller="$controller"
-                  else
-                      no_master_controllers+=("$controller")
-                  fi
+                  echo $controller
               done
-
-              # Stop slave controllers 
-              echo "Controller names without 'master':"
-              for controller in "${no_master_controllers[@]}"; do
-                  echo "/bin/jboss-cli.sh --connect --controller --commands=/host=$controller:shutdown"
-              done
-
-              # Stop the 'master' controller
-              if [ -n "$master_controller" ]; then
-                  echo "/bin/jboss-cli.sh --connect --controller= --commands=/host=$master_controller:shutdown"
-              fi
-          
+              ls -la ${{ env.WORKFLOW_FOLDER_NAME }}
         - name: Checkout Repository of Database File
           if: ${{ github.event.inputs.database-update != 'false' }}
           uses: actions/checkout@v2
