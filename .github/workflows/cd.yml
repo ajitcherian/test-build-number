@@ -175,14 +175,14 @@ jobs:
         - name: Silence Alerts
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
-            echo "Silencing Alerts"
+            echo "Silencing Alerts" && ls -la
 
         - name: PROD | Stop Server Group and All Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
           run: echo "PROD | Stop Server Group and All Host Controllers"
           
         - name: Checkout Repository of Database File
-          #if: ${{ github.event.inputs.database-update != 'false' }}
+          if: ${{ github.event.inputs.database-update != 'false' }}
           uses: actions/checkout@v2
         # - name: Download Artifact
         #   uses: actions/download-artifact@v3
@@ -219,7 +219,7 @@ jobs:
 
         - name: PROD | Start Master Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
-          run: echo "PROD | Start Master Host Controllers" && ls -la $GITHUB_WORKSPACE/lynx-web && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
+          run: echo "PROD | Start Master Host Controllers" && ls -la lynx-web && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
               
         - name: PROD | Start Slave1 Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
