@@ -158,6 +158,9 @@ jobs:
       defaults:
         run:
           shell: bash
+      container:
+        image: mehulsharma20/sqlplus:v7
+        options: --user root
       steps:
         - name: Silence Alerts
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
