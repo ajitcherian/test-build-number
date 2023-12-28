@@ -68,6 +68,9 @@ env:
   PROJECT_NAME: "lynx"
   PROPERTY_FILE_CHANGE: "${{ github.event.inputs.only-copy-property-file }}"
   WORKFLOW_FOLDER_NAME: "lynx-web/target"
+defaults:
+  run:
+    working-directory: ./app 
 
 jobs:
     prerequisite:
