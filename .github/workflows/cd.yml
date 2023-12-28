@@ -184,7 +184,8 @@ jobs:
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
           run: | 
               # Replace commas with spaces to create an array
-              IFS=', ' read -r -a controllers <<< "${{ vars.CONTROLLER_NAMES }}"
+              controller_names=${{ vars.CONTROLLER_NAMES }}
+              IFS=', ' read -r -a controllers <<< "$controller_names"
 
               # Loop through the array of controller names
               for controller in "${controllers[@]}"; do
