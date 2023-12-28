@@ -184,13 +184,13 @@ jobs:
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
           run: | 
               # Replace commas with spaces to create an array
-              controller_names=`echo "${{ vars.CONTROLLER_NAMES }}"`
-              IFS=', ' read -r -a controllers <<< "$controller_names"
-
+              IFS=',' read -r -a controllers <<< `echo "${{ vars.CONTROLLER_NAMES }}"`
+              
               # Loop through the array of controller names
               for controller in "${controllers[@]}"; do
-                  echo "Controller name: $controller"
+                echo "Controller name: $controller"
               done
+
               echo "PROD | Stop Server Group and All Host Controllers"
           
         - name: Checkout Repository of Database File
