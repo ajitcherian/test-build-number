@@ -184,6 +184,7 @@ jobs:
           uses: actions/download-artifact@v3
           with:
             name: war_and_property_file
+            path: $GITHUB_WORKSPACE/${{ env.WORKFLOW_FOLDER_NAME }}
 
         - name: Database Changes
           if: ${{ github.event.inputs.database-update != 'false' }}
