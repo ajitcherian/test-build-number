@@ -123,6 +123,7 @@ jobs:
             echo `cat secrets.properties` >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
             echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
             ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
+            mv lynx-web $GITHUB_WORKSPACE/
 
         - name: Set Credentials for Jfrog Artifact
           if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
@@ -218,7 +219,7 @@ jobs:
 
         - name: PROD | Start Master Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
-          run: echo "PROD | Start Master Host Controllers" && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
+          run: echo "PROD | Start Master Host Controllers" && ls -la $GITHUB_WORKSPACE/lynx-web && ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
               
         - name: PROD | Start Slave1 Host Controllers
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
