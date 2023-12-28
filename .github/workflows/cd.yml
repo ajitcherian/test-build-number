@@ -198,7 +198,8 @@ jobs:
             chmod +x jq
             cp jq /usr/bin
             jq --version
-            echo ${{ toJSON(secrets[github.event.inputs['database-update']]) }} > db_creds.json
+            echo "${{ toJSON(secrets[github.event.inputs['database-update']]) }}" > db_creds.json
+            cat db_creds.json
 
             DB_HOSTNAME=$(cat db_creds.json | jq -r '.oracle_db_hostname')
             echo ::add-mask::$DB_HOSTNAME
