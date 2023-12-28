@@ -184,14 +184,30 @@ jobs:
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
           run: | 
               # Replace commas with spaces to create an array
-              IFS=',' read -r -a controllers <<< `echo "${{ vars.CONTROLLER_NAMES }}"`
-              
+              IFS=',' read -r -a controllers <<< `echo "${{ vars.CONTROLLER_NAMES }}"`              
+              # Initialize variables to store controllers with and without 'master'
+              no_master_controllers=()
+              master_controller=""
+
               # Loop through the array of controller names
               for controller in "${controllers[@]}"; do
-                echo "Controller name: $controller"
+                  if [[ "$controller" == *"master"* ]]; then
+                      master_controller="$controller"
+                  else
+                      no_master_controllers+=("$controller")
+                  fi
               done
 
-              echo "PROD | Stop Server Group and All Host Controllers"
+              # Stop slave controllers 
+              echo "Controller names without 'master':"
+              for controller in "${no_master_controllers[@]}"; do
+                  echo "/bin/jboss-cli.sh --connect --controller --commands=/host=$controller:shutdown"
+              done
+
+              # Stop the 'master' controller
+              if [ -n "$master_controller" ]; then
+                  echo "/bin/jboss-cli.sh --connect --controller= --commands=/host=$master_controller:shutdown"
+              fi
           
         - name: Checkout Repository of Database File
           if: ${{ github.event.inputs.database-update != 'false' }}
