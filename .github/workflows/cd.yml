@@ -192,41 +192,6 @@ jobs:
               exit 1
             fi
             echo "Relase Number is: $releaseNumber"
-            #install jq
-            curl -LO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-            mv jq-linux64 jq
-            chmod +x jq
-            cp jq /usr/bin
-            jq --version
-            echo "${{ toJSON(secrets[github.event.inputs['database-update']]) }}" > db_creds.json
-            cat db_creds.json
-
-            DB_HOSTNAME=$(cat db_creds.json | jq -r '.oracle_db_hostname')
-            echo ::add-mask::$DB_HOSTNAME
-            echo DB_HOSTNAME="$DB_HOSTNAME" >> $GITHUB_ENV
-            export DB_HOSTNAME="$DB_HOSTNAME"
-
-            DB_HOSTPORT=$(cat db_creds.json | jq -r '.oracle_db_port')
-            echo ::add-mask::$DB_HOSTPORT
-            echo DB_HOSTPORT="$DB_HOSTPORT" >> $GITHUB_ENV
-            export DB_HOSTPORT="$DB_HOSTPORT"
-
-            SERVICE_NAME=$(cat db_creds.json | jq -r '.oracle_service_name')
-            echo ::add-mask::$SERVICE_NAME
-            echo SERVICE_NAME="$SERVICE_NAME" >> $GITHUB_ENV
-            export SERVICE_NAME="$SERVICE_NAME"
-
-            DB_USERNAME=$(cat db_creds.json | jq -r '.oracle_db_username')
-            echo ::add-mask::$DB_USERNAME
-            echo DB_USERNAME="$DB_USERNAME" >> $GITHUB_ENV
-            export DB_USERNAME="$DB_USERNAME"
-
-            DB_PASSWORD=$(cat db_creds.json | jq -r '.oracle_db_password')
-            echo ::add-mask::$DB_PASSWORD
-            echo DB_PASSWORD="$DB_PASSWORD" >> $GITHUB_ENV
-            export DB_PASSWORD="$DB_PASSWORD"
-
-            echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
             echo "Run Database Update Command"
 
         - name: Set java and maven
