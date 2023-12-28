@@ -123,7 +123,6 @@ jobs:
             echo `cat secrets.properties` >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
             echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
             ls -lh ${{ env.WORKFLOW_FOLDER_NAME }}
-            mv lynx-web $GITHUB_WORKSPACE/
 
         - name: Set Credentials for Jfrog Artifact
           if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
