@@ -20,7 +20,7 @@ jobs:
             echo "install mvn"
             cat /etc/os-release
             pacman -Syu --noconfirm
-            pacman -S openjdk17-jdk --noconfirm
+            pacman -S jdk17-openjdk --noconfirm
             pacman -S curl --noconfirm
             pacman -S maven --noconfirm
             mvn --version
