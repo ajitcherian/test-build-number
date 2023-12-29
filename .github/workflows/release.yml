@@ -1,33 +1,112 @@
-name: "Test install"
+name: "Test db"
 
 on:      
   push:
     branches: main
 
+env:
+  TAG_NUMBER: "lynx-releases-6.2.2-2023-12-04-080835-02"
+  DATABASE_UPDATE: "LMDA"
+  ENV: "qa"
+  JSON_VARIABLE: "${{ secrets[github.event.inputs['database-update']] }}"
+  PROJECT_NAME: "lynx"
+
 jobs:
     prerequisite:
       name: "Preparing Deployment"
+      environment: qa
       runs-on: ubuntu-latest
       defaults:
         run:
-          shell: bash 
+          shell: bash
       container:
-        image: mehulsharma20/sqlplus:v7
-        options: --user root    
+        image:  mehulsharma20/sqlplus:v7
+        options: --user root
       steps:
-        - name: Set Java and Maven
-          run: |
-            echo "install mvn"
-            pacman -Syu --noconfirm
-            pacman -S jdk17-openjdk curl maven --noconfirm
-            mvn --version
+        - name: Checkout repository
+          uses: actions/checkout@v2
+          #with:
+            #fetch-tags: 'true'
+            #ref: ${{ github.event.inputs.release-version }}
 
+        - name: Set Variables
+          run: |
+            # If release name has release/FHIR it will modify it to release-FHIR.
+            PROJECT_NAME="lynx"
+            echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
+            input="${{ env.TAG_NUMBER}}"
+            if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+              BRANCH_NAME=$(echo "${BASH_REMATCH[1]}" | sed 's/\//-/g')
+              echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV 
+            else
+              echo "Invalid input format: $input"
+            fi
+            echo $PROJECT_NAME $BRANCH_NAME
+
+
+        - name: Set Java and Maven
+          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
+          run: |
+            pacman -Syu --noconfirm
+            pacman -S  curl  --noconfirm
 
         - name: Database Changes
+          if: ${{ github.event.inputs.database-update != 'false' }}
           run: |
             echo "Running DB Scripts"
+
+            echo "Project Name is: $PROJECT_NAME"
+            input="${{ env.TAG_NUMBER}}"
+            if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+              BRANCH_NAME="${BASH_REMATCH[1]}"
+              echo $BRANCH_NAME
+              releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
+              echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV  
+            else
+              echo "TAG Number is not matching correct format so not able to get release number."
+              exit 1
+            fi
+            echo "Relase Number is: $releaseNumber"
+            #install jq
             curl -LO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
             mv jq-linux64 jq
             chmod +x jq
             cp jq /usr/bin
             jq --version
+            echo ${{ toJSON(secrets.LMDA) }} > db_creds.json
+
+            # DB_HOSTNAME=$(cat db_creds.json | jq -r '.oracle_db_hostname')
+            # echo ::add-mask::$DB_HOSTNAME
+            # echo DB_HOSTNAME="$DB_HOSTNAME" >> $GITHUB_ENV
+            # export DB_HOSTNAME="$DB_HOSTNAME"
+
+            # DB_HOSTPORT=$(cat db_creds.json | jq -r '.oracle_db_port')
+            # echo ::add-mask::$DB_HOSTPORT
+            # echo DB_HOSTPORT="$DB_HOSTPORT" >> $GITHUB_ENV
+            # export DB_HOSTPORT="$DB_HOSTPORT"
+
+            # SERVICE_NAME=$(cat db_creds.json | jq -r '.oracle_service_name')
+            # echo ::add-mask::$SERVICE_NAME
+            # echo SERVICE_NAME="$SERVICE_NAME" >> $GITHUB_ENV
+            # export SERVICE_NAME="$SERVICE_NAME"
+
+            # DB_USERNAME=$(cat db_creds.json | jq -r '.oracle_db_username')
+            # echo ::add-mask::$DB_USERNAME
+            # echo DB_USERNAME="$DB_USERNAME" >> $GITHUB_ENV
+            # export DB_USERNAME="$DB_USERNAME"
+
+            # DB_PASSWORD=$(cat db_creds.json | jq -r '.oracle_db_password')
+            # echo ::add-mask::$DB_PASSWORD
+            # echo DB_PASSWORD="$DB_PASSWORD" >> $GITHUB_ENV
+            # export DB_PASSWORD="$DB_PASSWORD"
+
+            # echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
+            # echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}" > db.txt
+            # echo "Run Database Update Command"
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: my-artifact
+            path: |
+                db_creds.json
+                
