@@ -1,8 +1,9 @@
 name: "Test db"
 
 on:      
-  push:
-    branches: main
+  # push:
+  #   branches: main
+  workflow_dispatch:
 
 env:
   TAG_NUMBER: "lynx-releases-6.2.2-2023-12-04-080835-02"
