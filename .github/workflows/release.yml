@@ -18,11 +18,8 @@ jobs:
         - name: Set Java and Maven
           run: |
             echo "install mvn"
-            cat /etc/os-release
             pacman -Syu --noconfirm
-            pacman -S jdk17-openjdk --noconfirm
-            pacman -S curl --noconfirm
-            pacman -S maven --noconfirm
+            pacman -S jdk17-openjdk curl maven --noconfirm
             mvn --version
 
 
