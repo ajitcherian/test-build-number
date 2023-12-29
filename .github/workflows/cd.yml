@@ -68,7 +68,6 @@ env:
   JFROG_GROUP_ID: "lynx" #"ontada-fhir-service-developer-replica"
   CONFIG_FOLDER_PATH: "/shared/qa/config/"
   CONFIG_FILE_NAME: ${{ vars.CONFIG_FILE_NAME }}
-  JSON_VARIABLE: "${{ secrets[github.event.inputs['database-update']] }}"
   ROLLBACK_DIRECTORY: "/home/webadmin/rollback"
   PROJECT_NAME: "lynx"
   PROPERTY_FILE_CHANGE: "${{ github.event.inputs.only-copy-property-file }}"
@@ -76,19 +75,21 @@ env:
   JBOSS_WILDFLY_PATH: "/home/webadmin/wildfly-26.1.2.Final"
   SERVER_USERNAME: "root"
   SSH_PRIVATE_KEY: ${{ secrets.LYNX_KEY }}
-  #WILDFLY_SLAVE2_NAME: "lynx-prod-fg_slave2"
 
 jobs:
     prerequisite:
       name: "Preparing Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-latest
+      runs-on: kube-deploy
       defaults:
         run:
           shell: bash
       container:
-        image:  mehulsharma20/sqlplus:v7
+        image: mck-ontada-sre.jfrog.io/sqlplus/sqlplus:archlinux_base
         options: --user root
+        credentials:
+            username: ${{ secrets.JF_USER }}
+            password: ${{ secrets.JF_PASSWORD }}
       steps:
         - name: Checkout repository
           uses: actions/checkout@v2
@@ -136,43 +137,29 @@ jobs:
             echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
 
         - name: Set Credentials for Jfrog Artifact
-          run: echo "Set jfrog creds"
+          if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+          run: echo "set jfrog credentials"
 
         - name: Download Artifact
           if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
-            echo "Download artifact and move to target folder"
-            touch ./${{ env.WORKFLOW_FOLDER_NAME }}${{ env.TAG_NUMBER }}.war 
-            ls -la ${{ env.WORKFLOW_FOLDER_NAME }}
+            #Download artifact and move to target folder
+            touch ${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war
 
         - name: PROD | Copy Artifact to Master Server
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
-            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }}"
-            echo "username: ${{ env.SERVER_USERNAME }}"
-            echo "key: ${{ env.SSH_PRIVATE_KEY }}"
-            echo "source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war"
-            echo "target: /home/webadmin/"
-            echo "strip_components: 3"
+          
+            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }} username: ${{ env.SERVER_USERNAME }} key: ${{ env.SSH_PRIVATE_KEY }} source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war target: /home/webadmin/ strip_components: 3"
 
         - name: Copy Application Config files on All Machines
           run: |
-            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }}, ${{ secrets.SLAVE1_SERVER_HOSTNAME }}"
-            echo "username: ${{ env.SERVER_USERNAME }}"
-            echo "key: ${{ env.SSH_PRIVATE_KEY }}"
-            echo "source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}"
-            echo "target: ${{ env.CONFIG_FOLDER_PATH }}"
-            echo "strip_components: 3"
+            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }} username: ${{ env.SERVER_USERNAME }} key: ${{ env.SSH_PRIVATE_KEY }} source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }} target: ${{ env.CONFIG_FOLDER_PATH }} strip_components: 3" 
             
         - name: PROD | Putting Deployment WAR on Wildfly Domain
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
-            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }}"
-            echo "username: ${{ env.SERVER_USERNAME }}"
-            echo "key: ${{ env.SSH_PRIVATE_KEY }}"
-            echo "script_stop: true"
-            echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} ${{env.TAG_NUMBER }}.war  ${{env.TAG_NUMBER }}.war --runtime-name=lynxmobileWeb.war  --disabled"
-            echo "rm -rf /home/webadmin/${{env.TAG_NUMBER }}.war | true"
+             echo "PROD | Putting Deployment WAR on Wildfly Domain"
 
         - name: Set Java and Maven
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
@@ -185,7 +172,7 @@ jobs:
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
             cd ${{ env.WORKFLOW_FOLDER_NAME }}
-            ls -la
+            echo "undeploy lower env"
             cd ../../
 
         - name: Silence Alerts
@@ -193,17 +180,22 @@ jobs:
           run: |
             echo "Silencing Alerts"
 
-        - name: PROD | Stop Server Group and All Host Controllers
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
+        - name: Stop Server Groups
+          if: ( github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
           run: |
-              echo "PROD | Stop Server Group and All Host Controllers"
+            echo "Stop Server Groups" 
+
+        - name: PROD | Stop All Host Controllers
+          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
+          run: |
+              echo "JAVA_HOME=/home/webadmin/jdk-17.0.8+7 ; export JAVA_HOME"
               IFS=',' read -r -a controllers <<< `echo "${{ secrets.SLAVE_CONTROLLER_NAMES }}"`
               # Stop SLAVE controllers 
               for controller in "${controllers[@]}"; do
-                echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }}  $controller" >> slave-stop.txt 
+                echo "${{ env.JBOSS_WILDFLY_PATH }}/bin/jboss-cli.sh --connect --controller=${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} --commands=/host=$controller:shutdown"
               done
               # Stop MASTER controllers 
-              echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} ${{ secrets.MASTER_CONTROLLER_NAME }}" > master-stop.txt
+              echo "${{ env.JBOSS_WILDFLY_PATH }}/bin/jboss-cli.sh --connect --controller=${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} --commands=/host=${{ secrets.MASTER_CONTROLLER_NAME }}:shutdown"
 
         - name: Database Changes
           if: ${{ github.event.inputs.database-update != 'false' }}
@@ -256,44 +248,39 @@ jobs:
             export DB_PASSWORD="$DB_PASSWORD"
 
             echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
-            echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}" > db.txt
             echo "Run Database Update Command"
+            echo "bash ./update_db.sh ${DATABASE_UPDATE} ${TAG_NUMBER} sql/CHECK_SQL_SCRIPT_EXISTS.sql sql/INSERT_SQL_SCRIPT.sql $releaseNumber" >> ${{ env.WORKFLOW_FOLDER_NAME }}/db-cmd.txt
 
+        - name: PROD | Start Master Host Controllers
+          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
+          run: |
+              echo "Run start script"
+
+        - name: PROD | Start Slave Host Controllers
+          env: 
+            SLAVE_CONTROLLER_IPS: ${{ secrets.SLAVE_CONTROLLER_IPS }}
+          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' && env.SLAVE_CONTROLLER_IPS != '' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' && env.SLAVE_CONTROLLER_IPS != '')
+          run: |
+            echo "Start slave script controller"
+            
+        - name: PROD | Undeploy & Deploy Deployment File
+          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
+          run: |
+              echo "Undeploy and deploy prod"
+              
         - name: Deploy to WildFly
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
             cd ${{ env.WORKFLOW_FOLDER_NAME }}
-            ls -la
+            echo "deploy lower env"
             cd ../../
 
-        - name: PROD | Start Master Host Controllers
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
-          run: | 
-            echo "${{ secrets.MASTER_CONTROLLER_IP }} PROD Start Slave Host Controllers"
-              
-        - name: PROD | Start Slave Host Controllers
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )  # Need to add one more condition
+        - name: Start Server Groups
+          if: ( github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' )
           run: |
-            echo "${{ secrets.SLAVE_CONTROLLER_IPS }} PROD Start Slave Host Controllers"
-            
-        - name: PROD | Undeploy & Deploy Deployment File and Start Server Groups
-          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-            echo "PROD | Undeploy & Deploy Deployment File and Start Server Groups"
-
+              echo "Start Server Groups"
+                  
         - name: PROD | Storing Property file for Rollback
           if: ${{ github.event.inputs.deploy-environment == 'prod' }}
           run: |
-              
-              echo "${{ env.ROLLBACK_DIRECTORY }}/$BRANCH_NAME"
-              echo " ${{ env.CONFIG_FOLDER_PATH }}/${{ env.CONFIG_FILE_NAME }} ${{ env.ROLLBACK_DIRECTORY }}/$BRANCH_NAME/${{ env.TAG_NUMBER }}-${{ github.run_number }}.properties"
-
-        - uses: actions/upload-artifact@v4
-          with:
-            name: my-artifact
-            path: |
-                db.txt
-                db_creds.json
-                slave-stop.txt 
-                master-stop.txt 
-                
+            echo "PROD | Storing Property file for Rollback"
