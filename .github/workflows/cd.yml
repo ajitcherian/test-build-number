@@ -200,7 +200,7 @@ jobs:
               IFS=',' read -r -a controllers <<< `echo "${{ vars.SLAVE_CONTROLLER_NAMES }}"`
               # Stop SLAVE controllers 
               for controller in "${controllers[@]}"; do
-                echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }}  $controller" > slave-stop.txt 
+                echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }}  $controller" >> slave-stop.txt 
               done
               # Stop MASTER controllers 
               echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} ${{ vars.MASTER_CONTROLLER_NAME }}" > master-stop.txt
