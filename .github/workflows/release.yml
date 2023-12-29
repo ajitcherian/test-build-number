@@ -42,10 +42,14 @@ jobs:
               echo "Invalid input format: $input"
             fi
             echo $PROJECT_NAME $BRANCH_NAME
-
+            
+        - name: Set Java and Maven
+          if: ${{ secrets.BLANK_SECRET == null }}
+          run: |
+            echo "if blank secret is null"
 
         - name: Set Java and Maven
-          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
+          if: ${{ secrets.BLANK_SECRET != null }}
           run: |
             pacman -Syu --noconfirm
             pacman -S  curl  --noconfirm
