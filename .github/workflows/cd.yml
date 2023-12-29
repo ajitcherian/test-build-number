@@ -197,13 +197,13 @@ jobs:
           if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' )
           run: |
               echo "PROD | Stop Server Group and All Host Controllers"
-              IFS=',' read -r -a controllers <<< `echo "${{ vars.SLAVE_CONTROLLER_NAMES }}"`
+              IFS=',' read -r -a controllers <<< `echo "${{ secrets.SLAVE_CONTROLLER_NAMES }}"`
               # Stop SLAVE controllers 
               for controller in "${controllers[@]}"; do
                 echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }}  $controller" >> slave-stop.txt 
               done
               # Stop MASTER controllers 
-              echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} ${{ vars.MASTER_CONTROLLER_NAME }}" > master-stop.txt
+              echo "${{ env.JBOSS_WILDFLY_PATH }} ${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} ${{ secrets.MASTER_CONTROLLER_NAME }}" > master-stop.txt
 
         - name: Database Changes
           if: ${{ github.event.inputs.database-update != 'false' }}
