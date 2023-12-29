@@ -148,22 +148,16 @@ jobs:
 
         - name: Set Java and Maven
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: echo "install mvn"
+          run: |
+            echo "install mvn"
+            apk add openjdk17-jdk
+            apk add maven
+            mvn --version
 
         - name: Undeploy to WildFly
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: echo "Undeploy on lower env"
-        # - name: Upload math result for job 2
-        #   uses: actions/upload-artifact@v3
-        #   with:
-        #     name: war_and_property_file
-        #     path: ${{ env.WORKFLOW_FOLDER_NAME }}
-        #     retention-days: 1
-        # - name: Cache Primes
-        #   id: cache-primes
-        #   uses: actions/cache@v3
-        #   with:
-        #      path: ${{ env.WORKFLOW_FOLDER_NAME }}
+  
         - name: Silence Alerts
           if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
@@ -180,15 +174,7 @@ jobs:
                   echo $controller
               done
               ls -la ${{ env.WORKFLOW_FOLDER_NAME }}
-        - name: Checkout Repository of Database File
-          if: ${{ github.event.inputs.database-update != 'false' }}
-          uses: actions/checkout@v2
-        # - name: Download Artifact
-        #   uses: actions/download-artifact@v3
-        #   with:
-        #     name: war_and_property_file
-        #     path: ${{ env.WORKFLOW_FOLDER_NAME }}
-
+  
         - name: Database Changes
           if: ${{ github.event.inputs.database-update != 'false' }}
           run: |
@@ -207,11 +193,12 @@ jobs:
             fi
             echo "Relase Number is: $releaseNumber"
             echo "Run Database Update Command"
-         
-        # - uses: actions/cache/restore@v3
-        #   id: restore-build
-        #    with:
-        #   path: ${{ github.workspace }}/your-folder-to-cache
+            curl -LO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+            mv jq-linux64 jq
+            chmod +x jq
+            cp jq /usr/bin
+            jq --version
+
           
         - name: Set java and maven
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
