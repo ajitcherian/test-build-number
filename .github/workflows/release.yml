@@ -44,12 +44,16 @@ jobs:
             echo $PROJECT_NAME $BRANCH_NAME
             
         - name: Set Java and Maven
-          if: ${{ secrets.BLANK_SECRET == null }}
+          env: 
+            BLANK_SECRET: ${{ secrets.BLANK_SECRET }}
+          if: ${{ env.BLANK_SECRET == '' }}
           run: |
             echo "if blank secret is null"
 
         - name: Set Java and Maven
-          if: ${{ secrets.BLANK_SECRET != null }}
+          env: 
+            BLANK_SECRET: ${{ secrets.BLANK_SECRET }}
+          if: ${{ env.BLANK_SECRET != '' }}
           run: |
             pacman -Syu --noconfirm
             pacman -S  curl  --noconfirm
