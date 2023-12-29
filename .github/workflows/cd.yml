@@ -150,8 +150,9 @@ jobs:
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
           run: |
             echo "install mvn"
-            apk add openjdk17-jdk
-            apk add maven
+            apt update
+            apt install openjdk17-jdk -y
+            apt install maven -y
             mvn --version
 
         - name: Undeploy to WildFly
@@ -198,11 +199,6 @@ jobs:
             chmod +x jq
             cp jq /usr/bin
             jq --version
-
-          
-        - name: Set java and maven
-          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: echo "Install mvn"
 
         - name: Deploy to WildFly
           if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
