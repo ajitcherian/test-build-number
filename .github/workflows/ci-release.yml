@@ -28,7 +28,10 @@ jobs:
         run: |
           if [[ "${{ env.BRANCH_NAME }}" == releases/FHIR* ]]; then
             BRANCH_NAME_SLUG=$(echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:')
+            echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:' > txt.txt
+            cat txt.txt
             echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG">> $GITHUB_ENV
+            echo "this is branch $BRANCH_NAME_SLUG"
             echo "Current branch ${{ env.BRANCH_NAME }}"
             echo "The branch name is: $BRANCH_NAME_SLUG"
             echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
@@ -56,7 +59,6 @@ jobs:
         id: set_env
         run: |
             DOCKER_IMAGE_NAME=${{ env.DOCKER_REGISTRY }}/${{ env.JFROG_REPO_NAME }}/${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}
-            echo "this is branch ${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}"
             DOCKER_IMAGE_NAME=`echo $DOCKER_IMAGE_NAME | tr '[:upper:]' '[:lower:]'`
             echo DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME >> $GITHUB_OUTPUT
             echo "DOCKER_TAG=${{ env.PROJECT_NAME }}-${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}-${{ env.CURRENT_DATE_TIME }}-${{ env.BUILD_NUMBER }}" >> $GITHUB_OUTPUT
