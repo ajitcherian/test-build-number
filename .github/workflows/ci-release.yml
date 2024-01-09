@@ -35,7 +35,7 @@ jobs:
       - name: Set sanitized branch name
         id: set-branch-name
         run: |
-          if [[ "${{ env.BRANCH_NAME }}" == releases/FHIR* ]]; then
+          if [[ "${{ env.BRANCH_NAME }}" == release/FHIR* ]]; then
             BRANCH_NAME_SLUG=$(echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:')
             echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:' > txt.txt
             cat txt.txt
