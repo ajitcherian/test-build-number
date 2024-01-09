@@ -41,8 +41,6 @@ jobs:
             echo "The branch name is: $BRANCH_NAME_SLUG"
             echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
           fi
-      outputs:
-        BRANCH_NAME_SLUG: ${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}
 
       # Setting Github Environment variables  
       - name: Set Docker Tags
