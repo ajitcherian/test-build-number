@@ -4,13 +4,6 @@ on:
   push:
     branches:
       - '*'
-  workflow_dispatch:
-    inputs:
-      enabled_veracode_run:
-        description: 'Execute Veracode scan in release branch'
-        type: boolean
-        required: true
-        default: false
 
 jobs:
   set_env:
