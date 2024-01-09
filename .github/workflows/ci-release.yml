@@ -19,7 +19,7 @@ jobs:
     env:
       DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
       JFROG_REPO_NAME: "ontada-fhir-service"
-      #BRANCH_NAME: ${{ env.GITHUB_REF_NAME }}
+      BRANCH_NAME: ${{ env.GITHUB_REF_NAME }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,7 +27,6 @@ jobs:
       - name: Set sanitized branch name
         id: set-branch-name
         run: |
-          echo "this is $GITHUB_REF_NAME"
           if [[ "${{ env.BRANCH_NAME }}" == releases/FHIR* ]]; then
             BRANCH_NAME_SLUG=$(echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:')
             echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:' > txt.txt
