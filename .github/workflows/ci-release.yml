@@ -19,11 +19,19 @@ jobs:
     env:
       DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
       JFROG_REPO_NAME: "ontada-fhir-service"
-      BRANCH_NAME: ${{ env.GITHUB_REF_NAME }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+        
+      # Setting Github Environment variables  
+      - name: Set Docker Tags
+        run: |
+            echo "username: ${{ vars.USER_NAME }}"
+            echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
+            echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
+            echo "CURRENT_DATE_TIME=$(date -u +%Y-%m-%d-%H%M%S)" >> $GITHUB_ENV
+            echo BUILD_NUMBER="${{ github.run_number }}" >> $GITHUB_ENV
+      
       - name: Set sanitized branch name
         id: set-branch-name
         run: |
@@ -46,15 +54,6 @@ jobs:
             echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
           fi
 
-      # Setting Github Environment variables  
-      - name: Set Docker Tags
-        run: |
-            echo "username: ${{ vars.USER_NAME }}"
-            echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
-            echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
-            echo "CURRENT_DATE_TIME=$(date -u +%Y-%m-%d-%H%M%S)" >> $GITHUB_ENV
-            echo BUILD_NUMBER="${{ github.run_number }}" >> $GITHUB_ENV
-      
       # Exposing the Github Environment variables as the output to be used globaly in the workflow
       - name: Creating Major TAGs
         id: set_env
