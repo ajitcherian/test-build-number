@@ -18,5 +18,5 @@ jobs:
       - id: step3
         run: echo "step3" && echo "this is ${{ job.job1.step2.status }}"
       - id: step4
-        if: ${{ env.num == "success" }}
+        if: contains(env.num, "success")
         run: echo "step4"
