@@ -5,14 +5,18 @@ jobs:
     runs-on: ubuntu-la***REMOVED***
     steps:
       - id: step1
-        run: echo "step1"
+        run: echo "num=success" >> $GITHUB_OUTPUT
       - id: step2
         run: sleep 60 ; echo "step2" 
+    outputs: 
+      num: ${{ steps.step1.outputs.num }}
   job2:
     runs-on: ubuntu-la***REMOVED***
+    env: 
+      num: ${{ needs.step1.outputs.num }}
     steps:
       - id: step3
         run: echo "step3" && echo "t***REMOVED***s is ${{ job.job1.step2.status }}"
       - id: step4
-        if: ${{ job.job1.step2.status == 'success' }} 
+        if: ${{ env.num == success }}
         run: echo "step4"
