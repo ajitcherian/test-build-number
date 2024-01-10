@@ -14,5 +14,5 @@ jobs:
       - id: step3
         run: echo "step3"
       - id: step4
-        if: ${{ job.status == 'success' }} 
+        if: ${{ job.job1.step2.status == 'success' }} 
         run: echo "step4"
