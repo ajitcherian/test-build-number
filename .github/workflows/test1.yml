@@ -7,7 +7,7 @@ jobs:
       - id: step1
         run: echo "step1"
       - id: step2
-        run: echo "step2" 
+        run: sleep 60 ; echo "step2" 
   job2:
     runs-on: ubuntu-la***REMOVED***
     steps:
