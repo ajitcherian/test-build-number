@@ -16,7 +16,7 @@ jobs:
       num: ${{ needs.step1.outputs.num }}
     steps:
       - id: step3
-        run: echo "step3" && echo "this is ${{ job.job1.step2.status }}"
+        run: echo "step3" 
       - id: step4
-        if: env.num ==  "success"
+        if: (env.num == 'success')
         run: echo "step4"
