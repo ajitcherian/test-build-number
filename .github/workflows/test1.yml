@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-la***REMOVED***
     steps:
       - id: step3
-        run: echo "step3"
+        run: echo "step3" && echo "t***REMOVED***s is ${{ job.job1.step2.status }}
       - id: step4
         if: ${{ job.job1.step2.status == 'success' }} 
         run: echo "step4"
