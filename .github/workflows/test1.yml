@@ -5,18 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: step1
-        run: "echo test=hello >> $GITHUB_OUTPUT"
-      - name: step2
-        if: contains(steps.step1.outputs.test, 'hello')
-        run: echo is executed
-      - name: step3
-        if: contains(steps.step1.outputs.test, 'bye')
-        run: echo not executed
+        run: "echo OUTPUT_JOB1=hello >> $GITHUB_OUTPUT"
+    outputs:
+      OUTPUT_JOB1: ${{ steps.step1.outputs.OUTPUT_JOB1 }}
   job2:
     runs-on: ubuntu-latest
     steps:
       - name: step2
-        if: contains(steps.step1.outputs.test, 'hello')
+        if: contains(needs.job1.outputs.OUTPUT_JOB1, 'hello')
         run: echo is executed
       - name: step3
         if: contains(steps.step1.outputs.test, 'bye')
