@@ -1,68 +1,23 @@
-name: Deploy to Server
-
-on:
-  # push:
-  #   branches:
-  #     - main
-  workflow_dispatch:
+name: Predefined function
+on: push
 jobs:
-  deploy:
+  job1:
     runs-on: ubuntu-la***REMOVED***
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - run: mkdir kube
-      - name: Make envfile
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_DEBUG: false
-          envkey_SOME_API_KEY: "123456abcdef"
-          some_other_variable: foobar
-          envkey_DESTINATION_SERVER_HOST: ${{ secrets.DESTINATION_SERVER_HOST }}
-          envkey_DESTINATION_SERVER_USERNAME: ${{ secrets.DESTINATION_SERVER_USERNAME }}
-          file_name: kube/secrets.txt
-          fail_on_empty: false
-          sort_keys: false
-          
-      - run: | 
-         ls -la
-         cat kube/secrets.txt
-      - uses: actions/upload-artifact@v3
-        with:
-            name: my-artifact
-            path: kube/secrets.txt
-
-
-      #- name: Setup SSH
-      #  uses: webfactory/ssh-agent@v0.5.0
-      #  with:
-      #    ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      #- name: Copy files to destination server
-      #  uses: appleboy/scp-action@master
-      #  with:
-      #    host: ${{ secrets.DESTINATION_SERVER_HOST }}
-      #    username: ${{ secrets.DESTINATION_SERVER_USERNAME }}
-      #    key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #    source: ./deployment.war 
-      #    target: /home/ec2-user/
-          
-      #- name: Run script on destination server
-      #  uses: appleboy/ssh-action@master
-      #  with:
-      #    host: ${{ secrets.DESTINATION_SERVER_HOST }}
-      #    username: ${{ secrets.DESTINATION_SERVER_USERNAME }}
-      #    key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #    script: |
-      #      cd /home/ec2-user
-      #      pwd && ls -la
-            #./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deployment deploy-file development.war  --name=lynx-dev.war --runtime-name=development.war  --disabled"
-
-            #CURRENT_DEPLOYMENT=$(./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deployment-info --server-group=lynx-prod-fg_server-group" | grep enabled | awk '{print $1}')
-
-            #./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="undeploy --name=$CURRENT_DEPLOYMENT --server-groups=lynx-prod-fg_server-group --keep-content"
-
-            #./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="/server-group=lynx-prod-fg_server-group/deployment=$CURRENT_DEPLOYMENT:remove()"
-
-            #./wildfly-26.1.2.Final/bin/jboss-cli.sh --connect --controller=3.10.52.183 --user=jboss --password=jboss123! --commands="deploy --name=lynx-dev.war --server-groups=lynx-prod-fg_server-group"
+      - id: step1
+        run: "echo ***REMOVED***=hello >> $GITHUB_OUTPUT"
+      - name: step2
+        if: contains(steps.step1.outputs.***REMOVED***, 'hello')
+        run: echo is executed
+      - name: step3
+        if: contains(steps.step1.outputs.***REMOVED***, 'bye')
+        run: echo not executed
+  job2:
+    runs-on: ubuntu-la***REMOVED***
+    steps:
+      - name: step2
+        if: contains(steps.step1.outputs.***REMOVED***, 'hello')
+        run: echo is executed
+      - name: step3
+        if: contains(steps.step1.outputs.***REMOVED***, 'bye')
+        run: echo not executed
