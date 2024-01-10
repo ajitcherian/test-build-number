@@ -17,3 +17,5 @@ jobs:
       - name: step3
         if: contains(steps.step1.outputs.test, 'bye')
         run: echo not executed
+      - name: step4
+        run: echo ${{ needs.job1.outputs.OUTPUT_JOB1 }}
