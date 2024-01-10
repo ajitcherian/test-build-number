@@ -5,17 +5,16 @@ jobs:
     runs-on: ubuntu-la***REMOVED***
     steps:
       - id: step1
-        run: "echo OUTPUT_JOB1=hello >> $GITHUB_OUTPUT"
+        run: echo "step1"
+      - id: step2
+        run: echo "step2" 
     outputs:
       OUTPUT_JOB1: ${{ steps.step1.outputs.OUTPUT_JOB1 }}
   job2:
     runs-on: ubuntu-la***REMOVED***
     steps:
-      - name: step2
-        if: contains(needs.job1.outputs.OUTPUT_JOB1, 'hello')
-        run: echo is executed
-      - name: step3
-        if: contains(steps.step1.outputs.***REMOVED***, 'bye')
-        run: echo not executed
-      - name: step4
-        run: echo ${{ needs.job1.outputs.OUTPUT_JOB1 }}
+      - id: step3
+        run: echo "step3"
+      - id: step4
+        if: ${{ job.status == 'success' }} 
+        run: echo "step4"
