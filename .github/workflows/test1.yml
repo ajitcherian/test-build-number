@@ -8,8 +8,6 @@ jobs:
         run: echo "step1"
       - id: step2
         run: echo "step2" 
-    outputs:
-      OUTPUT_JOB1: ${{ steps.step1.outputs.OUTPUT_JOB1 }}
   job2:
     runs-on: ubuntu-la***REMOVED***
     steps:
