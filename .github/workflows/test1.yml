@@ -4,19 +4,16 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     steps:
-      - id: step1
-        run: echo "num=success" >> $GITHUB_OUTPUT
-      - id: step2
-        run: sleep 60 ; echo "step2" 
-    outputs: 
-      num: ${{ steps.step1.outputs.num }}
-  job2:
-    runs-on: ubuntu-latest
-    env: 
-      num: ${{ needs.step1.outputs.num }}
-    steps:
-      - id: step3
-        run: echo "step3" 
-      - id: step4
-        if: (env.num == 'success')
-        run: echo "step4"
+      - uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_VAR1: ${{ secrets.VAR1 }}
+          envkey_VAR2: ${{ secrets.VAR2 }}
+          envkey_VAR3: ${{ secrets.VAR3 }}
+          # Below are variable for the module
+          file_name: secrets.properties
+          fail_on_empty: false
+          sort_keys: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: secrets.properties
