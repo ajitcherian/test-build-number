@@ -7,9 +7,6 @@ on:
         type: choice
         description: 'Choose environment'
         options:
-          - prod-fg
-          - prod-bg
-          - perf-poc
           - prod
         required: true
         default: 'prod'
@@ -19,8 +16,8 @@ env:
   ENV: "${{ github.event.inputs.deploy-environment }}"
 
 jobs:
-    approval:
-      name: "Approval Stage for Prod environment"
+    wait_job:
+      name: "Wait for approval to deploy on Prod environment"
       runs-on: ubuntu-latest
       permissions: write-all
       steps:
@@ -56,10 +53,9 @@ jobs:
       runs-on: ubuntu-latest
       environment: approval
       steps:
-      - name: Test
+      - name: Approved for Deployment
         run: |
-          echo "hello"
-    
+          echo "Deployment approved"
     db_update:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
