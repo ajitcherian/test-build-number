@@ -55,7 +55,6 @@ jobs:
       name: "Approval Run"
       runs-on: ubuntu-latest
       environment: approval
-      needs: [approval]
       steps:
       - name: Test
         run: |
