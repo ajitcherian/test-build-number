@@ -55,7 +55,6 @@ jobs:
       name: "Approval Run"
       runs-on: ubuntu-la***REMOVED***
       environment: approval
-      needs: [approval]
       steps:
       - name: Test
         run: |
