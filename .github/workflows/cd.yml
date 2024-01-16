@@ -1,97 +1,64 @@
-name: "POC | Final Deployment Workflow"
+name: "Production CD Workflow"
 
 on:      
   workflow_dispatch:
     inputs:
-      release-version:
-        description: 'TAG_NUMBER'
-        required: true
-        type: choice
-        default: "lynx-releases-6.2.2-2023-12-04-080835-02"
-        options:
-          - lynx-releases-6.2.2-2023-12-04-080835-02
-          - lynx-releases-6.2.1-2023-12-04-080835-01
-          - lynx-releases-6.13.4-2023-12-04-080835-589
-          - lynx-releases-1.1.0-2023-12-04-080835-581
-          - lynx-releases-1.1.3-2023-12-04-080835-582
-          - lynx-releases-1.1.3-2023-12-04-080835-582
-
-      database-update:
-        description: 'Select the environment if a database update needed. If not then select "false".'
-        type: choice
-        required: false
-        default: 'false'
-        options:
-          - 'false'
-          - LMDA
-          - LMDB
-          - LMDC
-          - LYNXDEV
-          - LMPERF
-          - LYNXQA1
-          - LYNXALPHA
-          - LYNXPERF
-          - LYNXPREVIEW
-          - LYNXQA
-
       deploy-environment:
         type: choice
         description: 'Choose environment'
         options:
-          - qa
-          - alpha
-          - perf
-          - preview
+          - prod-fg
+          - prod-bg
+          - perf-poc
           - prod
         required: true
-        default: 'qa'
+        default: 'prod'
 
-      restart-controllers:
-        type: boolean
-        required: true
-        default: false
-
-      only-copy-property-file:
-        type: choice
-        required: true
-        options:
-          - 'false'
-          - 'true'
 
 env:
-  TAG_NUMBER: "${{ github.event.inputs.release-version }}"
-  DATABASE_UPDATE: "${{ github.event.inputs.database-update }}"
   ENV: "${{ github.event.inputs.deploy-environment }}"
-  # Lynx artifactory path
-  JFROG_REGISTRY: "https://mck.jfrog.io" #"mck-ontada-sre.jfrog.io"
-  JFROG_REPO_NAME: "lynx-generic-local" #"ontada-sre"
-  JFROG_GROUP_ID: "lynx" #"ontada-f***REMOVED***r-service-developer-replica"
-  CONFIG_FOLDER_PATH: "/shared/qa/config/"
-  CONFIG_FILE_NAME: ${{ vars.CONFIG_FILE_NAME }}
-  ROLLBACK_DIRECTORY: "/home/webadmin/rollback"
-  PROJECT_NAME: "lynx"
-  PROPERTY_FILE_CHANGE: "${{ github.event.inputs.only-copy-property-file }}"
-  WORKFLOW_FOLDER_NAME: "lynx-web/target"
-  JBOSS_WILDFLY_PATH: "/home/webadmin/wildfly-26.1.2.Final"
-  SERVER_USERNAME: "root"
-  SSH_PRIVATE_KEY: ${{ secrets.LYNX_KEY }}
 
 jobs:
-    prerequisite:
-      name: "Preparing Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+    approval:
+      name: "Approval Stage for Prod environment"
+      runs-on: ubuntu-la***REMOVED***
+      steps:
+        -
+          name: Get Code
+          uses: actions/checkout@v2
+          if: contains(github.event.inputs.deploy-environment, 'prod')
+        - name: "Check and Cancel Job"
+          if: contains(github.event.inputs.deploy-environment, 'prod')
+          env:
+            GH_TOKEN: ${{ github.token }}
+          run: |
+            total_sleep_time=150 # Total sleep time in seconds
+            check_interval=15    # Check interval in seconds
+         
+            # Calculate the number of iterations needed
+            iterations=$((total_sleep_time / check_interval))
+          
+            # Loop for the specified number of iterations
+            for ((i = 0; i < iterations; i++)); do
+              status=$(gh run view ${{ github.run_id }} --json status | jq -r .status)
+          
+              if [ "$status" != "waiting" ]; then
+                total_sleep_time=300 # New total sleep time in seconds
+                # Exit the loop and script
+                exit 0
+              fi
+              sleep $check_interval
+            done        
+            gh run cancel ${{ github.run_id }}
+    db_update:
+      name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: kube-deploy
+      runs-on: ubuntu-la***REMOVED***
       defaults:
         run:
           shell: bash
-      container:
-        image: mck-ontada-sre.jfrog.io/sqlplus/sqlplus:archlinux_base
-        options: --user root
-        credentials:
-            username: ${{ secrets.JF_USER }}
-            password: ${{ secrets.JF_PASSWORD }}
       steps:
-        - name: Checkout repository
+        - name: Checkout Repository
           uses: actions/checkout@v2
           #with:
             #fetch-tags: 'true'
@@ -99,188 +66,38 @@ jobs:
 
         - name: Set Variables
           run: |
-            # If release name has release/FHIR it will modify it to release-FHIR.
-            PROJECT_NAME="lynx"
-            echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
-            input="${{ env.TAG_NUMBER}}"
-            if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
-              BRANCH_NAME=$(echo "${BASH_REMATCH[1]}" | sed 's/\//-/g')
-              echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV 
-            else
-              echo "Invalid input format: $input"
-            fi
-            echo $PROJECT_NAME $BRANCH_NAME
-        - name: "Make secret file"
-          uses: SpicyPizza/create-envfile@v2.0
-          with:
-            # Add variable name with prefix "envkey_<VARIABLE-NAME>".
-            envkey_INTERFACE_USERNAME: ${{ secrets.INTERFACE_USERNAME }}
-            envkey_INTERFACE_PASS: ${{ secrets.INTERFACE_PASS }}
-            envkey_ATTP_CLIENT_ID: ${{ secrets.ATTP_CLIENT_ID }}
-            envkey_ATTP_CLIENT_SECRET: ${{ secrets.ATTP_CLIENT_SECRET }}
-            envkey_ORDER_SERVICE_SENDER_ID: ${{ secrets.ORDER_SERVICE_SENDER_ID }}
-            envkey_ORDER_SERVICE_SENDER_SECRET: ${{ secrets.ORDER_SERVICE_SENDER_SECRET }}
-            envkey_ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-            #Not common
-            envkey_SALES_ORDER_API_KEY: ${{ secrets.SALES_ORDER_API_KEY }}
-            # Below are variable for the module
-            file_name: secrets.properties
-            fail_on_empty: false
-            sort_keys: false
+            echo "Job1"
 
-        #Generate and copy property file to server
-        - name: Set application properties file
+    post_db_update:
+      name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+      environment: ${{ github.event.inputs.deploy-environment }}
+      needs: [db_update]
+      if: success()
+      runs-on: ubuntu-la***REMOVED***
+      defaults:
+        run:
+          shell: bash
+      steps:
+        - name: Set Application Properties File
           run: |
-            mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
-            echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
-            echo `cat secrets.properties` >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
-            echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }}
+           echo "Job2"
+        
+    rollback_db_update:
+      name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+      environment: ${{ github.event.inputs.deploy-environment }}
+      runs-on: ubuntu-la***REMOVED***
+      needs: [db_update,approval]
+      if: failure()
+      defaults:
+        run:
+          shell: bash
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+          #with:
+            #fetch-tags: 'true'
+            #ref: ${{ github.event.inputs.release-version }}
 
-        - name: Set Credentials for Jfrog Artifact
-          if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: echo "set jfrog credentials"
-
-        - name: Download Artifact
-          if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        - name: Set Variables
           run: |
-            #Download artifact and move to target folder
-            touch ${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war
-
-        - name: PROD | Copy Artifact to Master Server
-          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-          
-            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }} username: ${{ env.SERVER_USERNAME }} key: ${{ env.SSH_PRIVATE_KEY }} source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war target: /home/webadmin/ strip_components: 3"
-
-        - name: Copy Application Config files on All Mac***REMOVED***nes
-          run: |
-            echo "host: ${{ secrets.MASTER_CONTROLLER_IP }} username: ${{ env.SERVER_USERNAME }} key: ${{ env.SSH_PRIVATE_KEY }} source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.CONFIG_FILE_NAME }} target: ${{ env.CONFIG_FOLDER_PATH }} strip_components: 3" 
-            
-        - name: PROD | Putting Deployment WAR on Wildfly Domain
-          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-             echo "PROD | Putting Deployment WAR on Wildfly Domain"
-
-        - name: Set Java and Maven
-          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-            pacman -Syu --noconfirm
-            pacman -S jdk17-openjdk curl maven --noconfirm
-            mvn --version
-
-        - name: Undeploy to WildFly
-          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-            cd ${{ env.WORKFLOW_FOLDER_NAME }}
-            echo "undeploy lower env"
-            cd ../../
-
-        - name: Silence Alerts
-          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-            echo "Silencing Alerts"
-
-        - name: Stop Server Groups
-          if: ( github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
-          run: |
-            echo "Stop Server Groups" 
-
-        - name: PROD | Stop All Host Controllers
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
-          run: |
-              echo "JAVA_HOME=/home/webadmin/jdk-17.0.8+7 ; export JAVA_HOME"
-              IFS=',' read -r -a controllers <<< `echo "${{ secrets.SLAVE_CONTROLLER_NAMES }}"`
-              # Stop SLAVE controllers 
-              for controller in "${controllers[@]}"; do
-                echo "${{ env.JBOSS_WILDFLY_PATH }}/bin/jboss-cli.sh --connect --controller=${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} --commands=/host=$controller:shutdown"
-              done
-              # Stop MASTER controllers 
-              echo "${{ env.JBOSS_WILDFLY_PATH }}/bin/jboss-cli.sh --connect --controller=${{ secrets.WILDFLY_HOSTNAME }}:${{ secrets.WILDFLY_PORT }} --commands=/host=${{ secrets.MASTER_CONTROLLER_NAME }}:shutdown"
-
-        - name: Database Changes
-          if: ${{ github.event.inputs.database-update != 'false' }}
-          run: |
-            echo "Running DB Scripts"
-
-            echo "Project Name is: $PROJECT_NAME"
-            input="${{ env.TAG_NUMBER}}"
-            if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
-              BRANCH_NAME="${BASH_REMATCH[1]}"
-              echo $BRANCH_NAME
-              releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
-              echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV  
-            else
-              echo "TAG Number is not matc***REMOVED***ng correct format so not able to get release number."
-              exit 1
-            fi
-            echo "Relase Number is: $releaseNumber"
-            #install jq
-            curl -LO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-            mv jq-linux64 jq
-            chmod +x jq
-            cp jq /usr/bin
-            jq --version
-            echo ${{ toJSON(secrets[github.event.inputs['database-update']]) }} > db_creds.json
-
-            DB_HOSTNAME=$(cat db_creds.json | jq -r '.oracle_db_hostname')
-            echo ::add-mask::$DB_HOSTNAME
-            echo DB_HOSTNAME="$DB_HOSTNAME" >> $GITHUB_ENV
-            export DB_HOSTNAME="$DB_HOSTNAME"
-
-            DB_HOSTPORT=$(cat db_creds.json | jq -r '.oracle_db_port')
-            echo ::add-mask::$DB_HOSTPORT
-            echo DB_HOSTPORT="$DB_HOSTPORT" >> $GITHUB_ENV
-            export DB_HOSTPORT="$DB_HOSTPORT"
-
-            SERVICE_NAME=$(cat db_creds.json | jq -r '.oracle_service_name')
-            echo ::add-mask::$SERVICE_NAME
-            echo SERVICE_NAME="$SERVICE_NAME" >> $GITHUB_ENV
-            export SERVICE_NAME="$SERVICE_NAME"
-
-            DB_USERNAME=$(cat db_creds.json | jq -r '.oracle_db_username')
-            echo ::add-mask::$DB_USERNAME
-            echo DB_USERNAME="$DB_USERNAME" >> $GITHUB_ENV
-            export DB_USERNAME="$DB_USERNAME"
-
-            DB_PASSWORD=$(cat db_creds.json | jq -r '.oracle_db_password')
-            echo ::add-mask::$DB_PASSWORD
-            echo DB_PASSWORD="$DB_PASSWORD" >> $GITHUB_ENV
-            export DB_PASSWORD="$DB_PASSWORD"
-
-            echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
-            echo "Run Database Update Command"
-            echo "bash ./update_db.sh ${DATABASE_UPDATE} ${TAG_NUMBER} sql/CHECK_SQL_SCRIPT_EXISTS.sql sql/INSERT_SQL_SCRIPT.sql $releaseNumber" >> ${{ env.WORKFLOW_FOLDER_NAME }}/db-cmd.txt
-
-        - name: PROD | Start Master Host Controllers
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true')
-          run: |
-              echo "Run start script"
-
-        - name: PROD | Start Slave Host Controllers
-          env: 
-            SLAVE_CONTROLLER_IPS: ${{ secrets.SLAVE_CONTROLLER_IPS }}
-          if: ( github.event.inputs.deploy-environment == 'prod' && github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' && env.SLAVE_CONTROLLER_IPS != '' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' && env.SLAVE_CONTROLLER_IPS != '')
-          run: |
-            echo "Start slave script controller"
-            
-        - name: PROD | Undeploy & Deploy Deployment File
-          if: ${{ github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-              echo "Undeploy and deploy prod"
-              
-        - name: Deploy to WildFly
-          if: ${{ github.event.inputs.deploy-environment != 'prod' && env.PROPERTY_FILE_CHANGE != 'true' }}
-          run: |
-            cd ${{ env.WORKFLOW_FOLDER_NAME }}
-            echo "deploy lower env"
-            cd ../../
-
-        - name: Start Server Groups
-          if: ( github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' ) || ( github.event.inputs.restart-controllers == 'true' && github.event.inputs.deploy-environment == 'prod' && env.PROPERTY_FILE_CHANGE != 'true' )
-          run: |
-              echo "Start Server Groups"
-                  
-        - name: PROD | Storing Property file for Rollback
-          if: ${{ github.event.inputs.deploy-environment == 'prod' }}
-          run: |
-            echo "PROD | Storing Property file for Rollback"
+            echo "Job3"
