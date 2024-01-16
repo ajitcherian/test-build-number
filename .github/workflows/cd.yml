@@ -22,6 +22,7 @@ jobs:
     approval:
       name: "Approval Stage for Prod environment"
       runs-on: ubuntu-latest
+      permissions: write-all
       steps:
         -
           name: Get Code
