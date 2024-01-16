@@ -32,7 +32,7 @@ jobs:
           env:
             GH_TOKEN: ${{ github.token }}
           run: |
-            total_sleep_time=60 # Total sleep time in seconds
+            total_sleep_time=30 # Total sleep time in seconds
             check_interval=15    # Check interval in seconds
          
             # Calculate the number of iterations needed
@@ -54,6 +54,7 @@ jobs:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-latest
+      needs: [approval]
       defaults:
         run:
           shell: bash
