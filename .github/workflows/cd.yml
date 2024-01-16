@@ -54,7 +54,6 @@ jobs:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-la***REMOVED***
-      needs: [approval]
       defaults:
         run:
           shell: bash
@@ -72,7 +71,7 @@ jobs:
     post_db_update:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      needs: [db_update]
+      needs: [approval,db_update]
       if: success()
       runs-on: ubuntu-la***REMOVED***
       defaults:
@@ -87,7 +86,7 @@ jobs:
       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-la***REMOVED***
-      needs: [db_update,approval]
+      needs: [approval,db_update]
       if: failure()
       defaults:
         run:
