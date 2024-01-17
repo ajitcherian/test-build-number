@@ -11,7 +11,7 @@ on:
         required: true
         default: 'prod'
 
-
+run-name: approval
 env:
   ENV: "${{ github.event.inputs.deploy-environment }}"
 
@@ -51,14 +51,14 @@ jobs:
     approval_job:
       name: "Approval Run"
       runs-on: ubuntu-la***REMOVED***
-      environment: approval
+      #environment: approval
       steps:
       - name: Approved for Deployment
         run: |
           echo "Deployment approved"
     db_update:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
+      #environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-la***REMOVED***
       needs: [approval_job]
       defaults:
@@ -77,7 +77,7 @@ jobs:
 
     post_db_update:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
+      #environment: ${{ github.event.inputs.deploy-environment }}
       needs: [approval_job,db_update]
       if: success()
       runs-on: ubuntu-la***REMOVED***
@@ -91,7 +91,7 @@ jobs:
         
     rollback_db_update:
       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
+      #environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-la***REMOVED***
       needs: [approval_job,db_update]
       if: failure()
