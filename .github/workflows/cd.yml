@@ -93,7 +93,7 @@ jobs:
       runs-on: ubuntu-la***REMOVED***
       needs: [db_update, approval_job]
       #if: failure()
-      if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result != 'failure' }}
+      if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result == 'success' }}
 
       defaults:
         run:
