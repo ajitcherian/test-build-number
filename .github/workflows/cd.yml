@@ -91,7 +91,7 @@ jobs:
       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-latest
-      needs: [approval_job,db_update]
+      needs: [db_update]
       if: failure()
       defaults:
         run:
