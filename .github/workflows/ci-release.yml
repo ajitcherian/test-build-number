@@ -24,10 +24,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Increase build
+        run: |
+         echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
     
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
         with:
           prerelease: true
-          tag: v.${{ github.run_number }}-${{ github.run_id }}
+          tag: ***REMOVED***-$BRANCH_NAME-.${{ github.run_number }}-${{ github.run_id }}
 
