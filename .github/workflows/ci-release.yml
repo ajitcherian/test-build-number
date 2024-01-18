@@ -71,5 +71,5 @@ jobs:
           #prerelease: true
           tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
           makeLatest: true
-          body: ${{ env.RUN_NUMBER_WITH_OFFSET }}
+          body: ${{ github.run_number }}
 
