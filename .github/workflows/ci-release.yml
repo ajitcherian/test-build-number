@@ -22,7 +22,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
     
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
