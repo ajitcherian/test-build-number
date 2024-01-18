@@ -27,11 +27,12 @@ jobs:
       - name: Increase build
         run: |
          echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
+         gh secret list
     
-      - name: Create Prerelease
-        uses: ncipollo/release-action@v1
-        with:
-          #prerelease: true
-          tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
-          makeLatest: true
+      # - name: Create Prerelease
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     #prerelease: true
+      #     tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
+      #     makeLatest: true
 
