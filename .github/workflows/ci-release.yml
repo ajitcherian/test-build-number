@@ -27,7 +27,7 @@ jobs:
       - name: Increase build
         run: |
          echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
-         gh secret list
+         gh secret list -e prod
     
       # - name: Create Prerelease
       #   uses: ncipollo/release-action@v1
