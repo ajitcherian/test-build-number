@@ -11,9 +11,7 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
-env:
-  RUN_NUMBER: ${{ github.run_number }}
-run-name: This is run name ${{ env.RUN_NUMBER }}
+run-name: $((1000+GITHUB_RUN_NUMBER))
 jobs:
   set_env:
     name: Setup Global Environments
