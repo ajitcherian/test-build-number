@@ -24,6 +24,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Increase build
+        run: |
+         echo "GITHUB_RUN_NUMBER_WITH_OFFSET=$(($GITHUB_RUN_NUMBER+1971))" >> $GITHUB_ENV
     
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
