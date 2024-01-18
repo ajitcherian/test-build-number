@@ -11,6 +11,7 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
+  
 jobs:
   set_env:
     name: Setup Global Environments
