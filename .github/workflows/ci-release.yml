@@ -28,7 +28,7 @@ jobs:
         run: |
             secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
             list_secret_names=$(gh secret list -e prod | awk '{print $1}')
-            for secret_name in "${secrets[@]}"; do
+            for secret_name in "${secrets_to_delete[@]}"; do
               if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
                 echo "Secret exists, deleting..."
                 gh secret delete $secret_name -e prod
