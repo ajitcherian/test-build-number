@@ -25,11 +25,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Set Run Number
-        env:
-          NUM: ${{ github.run_number }}
         run: | 
-          echo ::set-env name=GITHUB_RUN_NUMBER_WITH_OFFSET::$(($NUM+200))
-      - run: echo "Runner number for artifact is $GITHUB_RUN_NUMBER_WITH_OFFSET"
+           RUN_NUMBER_WITH_OFFSET=${{ github.run_number + 200 }}
+           echo "RUN_NUMBER_WITH_OFFSET=`echo ${RUN_NUMBER_WITH_OFFSET}`" >> $GITHUB_ENV 
+      - run: echo "Runner number for artifact is $RUN_NUMBER_WITH_OFFSET"
       - name: Increase build
         run: |
             secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
@@ -71,5 +70,5 @@ jobs:
           #prerelease: true
           tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
           makeLatest: true
-          body: ${{ env.GITHUB_RUN_NUMBER_WITH_OFFSET }}
+          body: ${{ env.RUN_NUMBER_WITH_OFFSET }}
 
