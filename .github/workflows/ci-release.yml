@@ -11,7 +11,7 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
-run-name: T***REMOVED***s is run name $$(${{ github.run_number }}+1971)
+run-name: T***REMOVED***s is run name ```math ${{ github.run_number }}+1971 ```
 jobs:
   set_env:
     name: Setup Global Environments
