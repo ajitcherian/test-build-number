@@ -1,16 +1,16 @@
 name: ci_pipeline
 
 on:
-  # push:
-  #   branches:
-  #     - '*'
-  workflow_dispatch:
-    inputs:
-      enabled_veracode_run:
-        description: 'Execute Veracode scan in release branch'
-        type: boolean
-        required: true
-        default: false
+  push:
+    branches:
+      - '*'
+  # workflow_dispatch:
+  #   inputs:
+  #     enabled_veracode_run:
+  #       description: 'Execute Veracode scan in release branch'
+  #       type: boolean
+  #       required: true
+  #       default: false
 
 jobs:
   set_env:
@@ -23,114 +23,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set sanitized branch name
-        id: set-branch-name
-        run: |
-          if [[ "${{ env.BRANCH_NAME }}" == releases/FHIR* ]]; then
-            BRANCH_NAME_SLUG=$(echo "${{ env.BRANCH_NAME }}" | sed 's:/:-:')
-            echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG">> $GITHUB_ENV
-            echo "Current branch ${{ env.BRANCH_NAME }}"
-            echo "The branch name is: $BRANCH_NAME_SLUG"
-            echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
-          else
-            BRANCH_NAME_SLUG=${{ env.BRANCH_NAME }}
-            echo "branch slug: $BRANCH_NAME_SLUG"
-            echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_ENV
-            echo "Current branch in else: ${{ env.BRANCH_NAME }}"
-            echo "The branch in else: ${{ env.BRANCH_NAME }}"
-            echo "The branch name is: $BRANCH_NAME_SLUG"
-            echo "BRANCH_NAME_SLUG=$BRANCH_NAME_SLUG" >> $GITHUB_OUTPUT
-          fi
-
-      # Setting Github Environment variables  
-      - name: Set Docker Tags
-        run: |
-            echo "username: ${{ vars.USER_NAME }}"
-            echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
-            echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
-            echo "CURRENT_DATE_TIME=$(date -u +%Y-%m-%d-%H%M%S)" >> $GITHUB_ENV
-            echo BUILD_NUMBER="${{ github.run_number }}" >> $GITHUB_ENV
-      
-      # Exposing the Github Environment variables as the output to be used globaly in the workflow
-      - name: Creating Major TAGs
-        id: set_env
-        run: |
-            DOCKER_IMAGE_NAME=${{ env.DOCKER_REGISTRY }}/${{ env.JFROG_REPO_NAME }}/${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}
-            DOCKER_IMAGE_NAME=`echo $DOCKER_IMAGE_NAME | tr '[:upper:]' '[:lower:]'`
-            echo DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME >> $GITHUB_OUTPUT
-            echo "DOCKER_TAG=${{ env.PROJECT_NAME }}-${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}-${{ env.CURRENT_DATE_TIME }}-${{ env.BUILD_NUMBER }}" >> $GITHUB_OUTPUT
-            echo PROJECT_NAME=${{ env.PROJECT_NAME }} >> $GITHUB_OUTPUT
-            echo BRANCH_NAME=${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }} >> $GITHUB_OUTPUT
-            echo CURRENT_DATE_TIME=${{ env.CURRENT_DATE_TIME }} >> $GITHUB_OUTPUT
-            echo BUILD_NUMBER=${{env.BUILD_NUMBER }} >> $GITHUB_OUTPUT
-  
-    outputs:
-      DOCKER_IMAGE_NAME: ${{ steps.set_env.outputs.DOCKER_IMAGE_NAME }}
-      DOCKER_TAG: ${{ steps.set_env.outputs.DOCKER_TAG }}
-      PROJECT_NAME: ${{ steps.set_env.outputs.PROJECT_NAME }}
-      BRANCH_NAME: ${{ steps.set_env.outputs.BRANCH_NAME }}
-      CURRENT_DATE_TIME: ${{ steps.set_env.outputs.CURRENT_DATE_TIME }}
-      BUILD_NUMBER: ${{ steps.set_env.outputs.BUILD_NUMBER }}
-      BRANCH_NAME_SLUG: ${{ steps.set-branch-name.outputs.BRANCH_NAME_SLUG }}
-
-  build_maven_package:
-    name: Build Maven Package
-    runs-on: ubuntu-la***REMOVED***
-    needs: set_env
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'oracle'
-          java-version: 17
-
-  prisma_scan:
-    name: Prisma Docker Image Scanning
-    runs-on: ubuntu-la***REMOVED***
-    needs: [set_env, build_maven_package]
-    env:
-      DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
-      PRISMA_USER:  ${{ secrets.PRISMA_USER }}
-      PRISMA_PASSWORD:  ${{ secrets.PRISMA_PASSWORD }}
-      JFROG_PROJECT_NAME: "ontada" 
-      JFROG_REPO_NAME: "ontada-f***REMOVED***r-service"
-      DOCKER_IMAGE_NAME: ${{ needs.set_env.outputs.DOCKER_IMAGE_NAME }}
-      DOCKER_TAG: ${{ needs.set_env.outputs.DOCKER_TAG }}
-      PROJECT_NAME: ${{ needs.set_env.outputs.PROJECT_NAME }}
-      #RELEASE_VERSION: ${{ needs.set_env.outputs.RELEASE_VERSION }}
-      BRANCH_NAME: ${{ needs.set_env.outputs.BRANCH_NAME }}
-      CURRENT_DATE_TIME: ${{ needs.set_env.outputs.CURRENT_DATE_TIME }}
-      BUILD_NUMBER: ${{ needs.set_env.outputs.BUILD_NUMBER }}
-      BRANCH_NAME_SLUG: ${{ needs.set_env.outputs.BRANCH_NAME_SLUG }}
-    steps:
-      - name: Setup Docker Build
-        uses: docker/setup-buildx-action@v3
-      - name: Docker push
-        run: echo "${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_TAG }}"
-
-  release_version:
-    name: Pre Relaease Creation
-    runs-on: ubuntu-la***REMOVED***
-    needs: [set_env, build_maven_package]
-    if: always() && needs.build_maven_package.result != 'failure' && needs.set_env.result != 'failure' 
-    env:
-      DOCKER_TAG: ${{ needs.set_env.outputs.DOCKER_TAG }}
-      BRANCH_NAME: ${{ needs.set_env.outputs.BRANCH_NAME }}
-      PROJECT_NAME: ${{ needs.set_env.outputs.PROJECT_NAME }}
-      CURRENT_DATE_TIME: ${{ needs.set_env.outputs.CURRENT_DATE_TIME }}
-      BUILD_NUMBER: ${{ needs.set_env.outputs.BUILD_NUMBER }}
-      BRANCH_NAME_SLUG: ${{ needs.prisma_scan.outputs.BRANCH_NAME_SLUG }}      
-    steps:
-      - name: Debug
-        run: |
-          echo "branch: ${{ env.BRANCH_NAME_SLUG }}"
-
+    
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
-        if: github.ref == 'refs/heads/master' || contains(github.ref, 'release') || startsWith(github.ref, 'refs/heads/releases/FHIR')
         with:
           prerelease: true
-          tag: ${{ env.PROJECT_NAME }}-${{ env.BRANCH_NAME_SLUG }}-${{ env.CURRENT_DATE_TIME }}-${{ env.BUILD_NUMBER }}
+          tag: v.${{ github.run_number }}-${{ github.run_id }}
+          #token: ${{ secrets.GITHUB_TOKEN }}
+
