@@ -33,4 +33,5 @@ jobs:
         with:
           prerelease: true
           tag: ***REMOVED***-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
+          makeLa***REMOVED***: true
 
