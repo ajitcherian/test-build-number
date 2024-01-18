@@ -11,7 +11,7 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
-run-name: 1000+${{ github.run_number }}
+run-name: Custom name
 jobs:
   set_env:
     name: Setup Global Environments
@@ -24,6 +24,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - name: Set Run Number
+        env:
+          NUM: ${{ github.run_number }}
+        run: | 
+          echo ::set-env name=GITHUB_RUN_NUMBER_WITH_OFFSET::$(($NUM+200))
+      - run: echo "Runner number for artifact is $GITHUB_RUN_NUMBER_WITH_OFFSET"
       - name: Increase build
         run: |
             secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
@@ -59,11 +65,11 @@ jobs:
             done          
             gh secret list -e prod
             gh secret list
-      # - name: Create Prerelease
-      #   uses: ncipollo/release-action@v1
-      #   with:
-      #     #prerelease: true
-      #     tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
-      #     makeLatest: true
-      #     body: ${{ github.run_number }}
+      - name: Create Prerelease
+        uses: ncipollo/release-action@v1
+        with:
+          #prerelease: true
+          tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
+          makeLatest: true
+          body: ${{ env.GITHUB_RUN_NUMBER_WITH_OFFSET }}
 
