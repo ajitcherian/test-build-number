@@ -11,7 +11,9 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
-run-name: This is run name ```math ${{ github.run_number }}+1971 ```
+env:
+  RUN_NUMBER: (${{ github.run_number }} + 1017)
+run-name: This is run name ${{ env.RUN_NUMBER }}
 jobs:
   set_env:
     name: Setup Global Environments
@@ -59,11 +61,11 @@ jobs:
             done          
             gh secret list -e prod
             gh secret list
-      - name: Create Prerelease
-        uses: ncipollo/release-action@v1
-        with:
-          #prerelease: true
-          tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
-          makeLatest: true
-          body: ${{ github.run_number }}
+      # - name: Create Prerelease
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     #prerelease: true
+      #     tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
+      #     makeLatest: true
+      #     body: ${{ github.run_number }}
 
