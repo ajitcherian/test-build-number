@@ -29,8 +29,20 @@ jobs:
          #echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME)" >> $GITHUB_ENV
          #gh secret list
          #gh secret list -e prod 
-         gh secret delete MASTER_CONTROLLER_NAME -e prod
-         gh secret list -e prod
+         #gh secret delete MASTER_CONTROLLER_NAME -e prod
+         #gh secret list -e prod
+         gh secret list --jq '.[] | select(.name == "MASTER_CONTROLLER_NAME").name' > /dev/null
+         if [ $? -eq 0 ]; then
+           echo "Secret exists, deleting..."
+           gh secret delete MASTER_CONTROLLER_NAME -e prod
+           if [ $? -eq 0 ]; then
+             echo "Secret deleted successfully."
+           else
+             echo "Failed to delete secret."
+           fi
+         else
+           echo "Secret does not exist."
+         fi
     
       # - name: Create Prerelease
       #   uses: ncipollo/release-action@v1
