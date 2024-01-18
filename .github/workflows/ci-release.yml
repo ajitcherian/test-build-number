@@ -41,8 +41,24 @@ jobs:
                 echo "Secret does not exist."
               fi
             done
-            echo "below"
+            echo "delete global"
+            secrets_to_delete=(LMDA LYNX_KEY SERVER_USERNAME TEST_KEY TEST_MASTER_IP TEST_SLAVE_IPS VAR1 VAR2 VAR3)
+            list_secret_names=$(gh secret list | awk '{print $1}')
+            for secret_name in "${secrets_to_delete[@]}"; do
+              if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
+                echo "Secret exists, deleting..."
+                gh secret delete $secret_name
+                if [ $? -eq 0 ]; then
+                  echo "Secret deleted successfully."
+                else
+                  echo "Failed to delete secret."
+                fi
+              else
+                echo "Secret does not exist."
+              fi
+            done          
             gh secret list -e prod
+            gh secret list
       # - name: Create Prerelease
       #   uses: ncipollo/release-action@v1
       #   with:
