@@ -21,6 +21,7 @@ jobs:
     env:
       DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
       JFROG_REPO_NAME: "ontada-f***REMOVED***r-service"
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
