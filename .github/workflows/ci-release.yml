@@ -31,7 +31,7 @@ jobs:
          #gh secret list -e prod 
          #gh secret delete MASTER_CONTROLLER_NAME -e prod
          #gh secret list -e prod
-         gh secret list --jq '.[] | select(.name == "MASTER_CONTROLLER_NAME").name' > /dev/null
+         gh secret list -e prod --jq '.[] | select(.name == "MASTER_CONTROLLER_NAME").name' > /dev/null
          if [ $? -eq 0 ]; then
            echo "Secret exists, deleting..."
            gh secret delete MASTER_CONTROLLER_NAME -e prod
