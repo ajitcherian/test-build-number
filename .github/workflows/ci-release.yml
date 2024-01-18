@@ -12,7 +12,7 @@ on:
   #       required: true
   #       default: false
 env:
-  RUN_NUMBER: (${{ github.run_number }} + 1017)
+  RUN_NUMBER: ${{ github.run_number }}
 run-name: T***REMOVED***s is run name ${{ env.RUN_NUMBER }}
 jobs:
   set_env:
