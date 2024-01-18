@@ -20,7 +20,7 @@ jobs:
     env:
       DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
       JFROG_REPO_NAME: "ontada-fhir-service"
-      GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ secrets.SECRET }} #${{ github.token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
