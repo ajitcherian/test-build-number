@@ -70,6 +70,6 @@ jobs:
         with:
           prerelease: true
           tag: test-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
-          makeLatest: true
+          #makeLatest: true
           body: ${{ github.run_number }}
 
