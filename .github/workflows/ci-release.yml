@@ -65,11 +65,14 @@ jobs:
             done          
             gh secret list -e prod
             gh secret list
+      - name: Create md
+        run: echo "[Build ${{ github.run_number }}](https://github.com/ajitcherian/***REMOVED***-build-number/actions/runs/${{ github.run_id }})" > file.md
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
         with:
           prerelease: true
-          tag: ***REMOVED***-${{ env.BRANCH_NAME }}-.${{ github.run_number }}-${{ github.run_id }}
+          tag: lynxmobile-replica-CD-DB-rollback-2023-12-04-${{ env.RUN_NUMBER_WITH_OFFSET }}
+          bodyFile: file.md
           #makeLa***REMOVED***: true
-          body: ${{ github.run_number }}
+          #body: 
 
