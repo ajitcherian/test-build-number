@@ -73,6 +73,6 @@ jobs:
           prerelease: true
           tag: lynxmobile-replica-CD-DB-rollback-2023-12-04-${{ env.RUN_NUMBER_WITH_OFFSET }}
           bodyFile: file.md
-          #makeLatest: true
+          makeLatest: true
           #body: 
 
