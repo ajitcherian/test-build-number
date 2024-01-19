@@ -72,7 +72,7 @@ jobs:
         with:
           prerelease: true
           tag: lynxmobile-replica-release-6.14.1-2023-12-04-${{ env.RUN_NUMBER_WITH_OFFSET }}
-          bodyFile: file.md
+          #bodyFile: file.md
           makeLatest: true
-          #body: 
+          body: "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})"
 
