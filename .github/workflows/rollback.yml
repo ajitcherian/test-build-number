@@ -113,7 +113,7 @@ jobs:
               releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
               echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV  
             else
-              echo "TAG Number is not matc***REMOVED***ng correct format so not able to get release number."
+              echo "TAG Number is not matching correct format so not able to get release number."
               exit 1
             fi
             echo "Relase Number is: $releaseNumber"
@@ -130,7 +130,7 @@ jobs:
                 releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
                 echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV  
               else
-                echo "TAG Number is not matc***REMOVED***ng correct format so not able to get release number."
+                echo "TAG Number is not matching correct format so not able to get release number."
                 exit 1
               fi
               echo "Relase Number is: $releaseNumber"
