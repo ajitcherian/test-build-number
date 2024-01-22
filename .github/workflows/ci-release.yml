@@ -15,7 +15,7 @@ on:
 jobs:
   set_env:
     name: Setup Global Environments
-    runs-on: ubuntu-la***REMOVED***
+    runs-on: ubuntu-latest
     permissions: write-all
     env:
       DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
@@ -66,13 +66,13 @@ jobs:
             gh secret list -e prod
             gh secret list
       - name: Create md
-        run: echo "[Build ${{ github.run_number }}](https://github.com/ajitcherian/***REMOVED***-build-number/actions/runs/${{ github.run_id }})" > file.md
+        run: echo "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})" > file.md
       - name: Create Prerelease
         uses: ncipollo/release-action@v1
         with:
           prerelease: true
           tag: lynxmobile-replica-release-6.14.1-2023-12-04-${{ env.RUN_NUMBER_WITH_OFFSET }}
           #bodyFile: file.md
-          makeLa***REMOVED***: true
-          body: "[Build ${{ github.run_number }}](https://github.com/ajitcherian/***REMOVED***-build-number/actions/runs/${{ github.run_id }})"
+          makeLatest: true
+          body: "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})"
 

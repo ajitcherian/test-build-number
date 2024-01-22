@@ -16,7 +16,7 @@ jobs:
     prerequisite:
       name: "Preparing Deployment"
       environment: qa
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       defaults:
         run:
           shell: bash

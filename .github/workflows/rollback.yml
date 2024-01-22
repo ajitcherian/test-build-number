@@ -66,7 +66,7 @@ jobs:
     prerequisite:
       name: "Preparing Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.rollback-to-release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-la***REMOVED***   #kube-deploy
+      runs-on: ubuntu-latest   #kube-deploy
       defaults:
         run:
           shell: bash
@@ -94,7 +94,7 @@ jobs:
     dbdeploy:
       name: "Deploy to ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.rollback-to-release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       if: ${{ always() && !failure() && !cancelled() }}
       needs: [prerequisite]
       defaults:

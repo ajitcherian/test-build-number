@@ -4,7 +4,7 @@ on:
 
 jobs:
   job1:
-    runs-on: ubuntu-la***REMOVED***
+    runs-on: ubuntu-latest
     steps:
       - uses: SpicyPizza/create-envfile@v2.0
         with:

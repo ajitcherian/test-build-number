@@ -16,7 +16,7 @@ env:
 jobs:
     wait_job:
       name: "Wait for approval to deploy on Prod environment"
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       permissions: write-all
       steps:
         -
@@ -48,7 +48,7 @@ jobs:
             gh run cancel ${{ github.run_id }}
     approval_job:
       name: "Approval Run"
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       environment: approval
       steps:
       - name: Approved for Deployment
@@ -57,7 +57,7 @@ jobs:
     db_update:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       needs: [approval_job]
       defaults:
         run:
@@ -78,7 +78,7 @@ jobs:
       environment: ${{ github.event.inputs.deploy-environment }}
       needs: [approval_job,db_update]
       if: success()
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       defaults:
         run:
           shell: bash
@@ -90,7 +90,7 @@ jobs:
     rollback_db_update:
       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-la***REMOVED***
+      runs-on: ubuntu-latest
       needs: [db_update, approval_job]
       #if: failure()
       if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result == 'success' }}
