@@ -137,7 +137,7 @@ jobs:
     - name: Set Application Properties File
       run: |
             echo ${{ vars.APPLICATION_PROPERTIES }} >> conf.txt
-            echo `cat secrets.properties` >> conf.txt
+            cat secrets.properties >> conf.txt
            
     - uses: actions/upload-artifact@v4
       with:
