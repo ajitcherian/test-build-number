@@ -1,110 +1,134 @@
-name: "Production CD Workflow"
+# name: "Production CD Workflow"
 
-on:      
-  workflow_dispatch:
-    inputs:
-      deploy-environment:
-        type: choice
-        description: 'Choose environment'
-        options:
-          - prod
-        required: true
-        default: 'prod'
-env:
-  ENV: "${{ github.event.inputs.deploy-environment }}"
+# on:      
+#   workflow_dispatch:
+#     inputs:
+#       deploy-environment:
+#         type: choice
+#         description: 'Choose environment'
+#         options:
+#           - prod
+#         required: true
+#         default: 'prod'
+# env:
+#   ENV: "${{ github.event.inputs.deploy-environment }}"
+
+# jobs:
+#     wait_job:
+#       name: "Wait for approval to deploy on Prod environment"
+#       runs-on: ubuntu-latest
+#       permissions: write-all
+#       steps:
+#         -
+#           name: Get Code
+#           uses: actions/checkout@v2
+#           if: contains(github.event.inputs.deploy-environment, 'prod')
+#         - name: "Check and Cancel Job"
+#           if: contains(github.event.inputs.deploy-environment, 'prod')
+#           env:
+#             GH_TOKEN: ${{ github.token }}
+#           run: |
+#             total_sleep_time=30 # Total sleep time in seconds
+#             check_interval=15    # Check interval in seconds
+         
+#             # Calculate the number of iterations needed
+#             iterations=$((total_sleep_time / check_interval))
+          
+#             # Loop for the specified number of iterations
+#             for ((i = 0; i < iterations; i++)); do
+#               status=$(gh run view ${{ github.run_id }} --json status | jq -r .status)
+          
+#               if [ "$status" != "waiting" ]; then
+#                 total_sleep_time=300 # New total sleep time in seconds
+#                 # Exit the loop and script
+#                 exit 0
+#               fi
+#               sleep $check_interval
+#             done        
+#             gh run cancel ${{ github.run_id }}
+#     approval_job:
+#       name: "Approval Run"
+#       runs-on: ubuntu-latest
+#       environment: approval
+#       steps:
+#       - name: Approved for Deployment
+#         run: |
+#           echo "Deployment approved"
+#     db_update:
+#       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+#       environment: ${{ github.event.inputs.deploy-environment }}
+#       runs-on: ubuntu-latest
+#       needs: [approval_job]
+#       defaults:
+#         run:
+#           shell: bash
+#       steps:
+#         - name: Checkout Repository
+#           uses: actions/checkout@v2
+#           #with:
+#             #fetch-tags: 'true'
+#             #ref: ${{ github.event.inputs.release-version }}
+
+#         - name: Set Variables
+#           run: |
+#             echo "Job1"
+
+#     post_db_update:
+#       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+#       environment: ${{ github.event.inputs.deploy-environment }}
+#       needs: [approval_job,db_update]
+#       if: success()
+#       runs-on: ubuntu-latest
+#       defaults:
+#         run:
+#           shell: bash
+#       steps:
+#         - name: Set Application Properties File
+#           run: |
+#            echo "Job2"
+        
+#     rollback_db_update:
+#       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+#       environment: ${{ github.event.inputs.deploy-environment }}
+#       runs-on: ubuntu-latest
+#       needs: [db_update, approval_job]
+#       #if: failure()
+#       if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result == 'success' }}
+
+#       defaults:
+#         run:
+#           shell: bash
+#       steps:
+#         - name: Checkout Repository
+#           uses: actions/checkout@v2
+#           #with:
+#             #fetch-tags: 'true'
+#             #ref: ${{ github.event.inputs.release-version }}
+
+#         - name: Set Variables
+#           run: |
+#             echo "Job3"
+
+name: Create envfile
+
+on: [ push ]
 
 jobs:
-    wait_job:
-      name: "Wait for approval to deploy on Prod environment"
-      runs-on: ubuntu-latest
-      permissions: write-all
-      steps:
-        -
-          name: Get Code
-          uses: actions/checkout@v2
-          if: contains(github.event.inputs.deploy-environment, 'prod')
-        - name: "Check and Cancel Job"
-          if: contains(github.event.inputs.deploy-environment, 'prod')
-          env:
-            GH_TOKEN: ${{ github.token }}
-          run: |
-            total_sleep_time=30 # Total sleep time in seconds
-            check_interval=15    # Check interval in seconds
-         
-            # Calculate the number of iterations needed
-            iterations=$((total_sleep_time / check_interval))
-          
-            # Loop for the specified number of iterations
-            for ((i = 0; i < iterations; i++)); do
-              status=$(gh run view ${{ github.run_id }} --json status | jq -r .status)
-          
-              if [ "$status" != "waiting" ]; then
-                total_sleep_time=300 # New total sleep time in seconds
-                # Exit the loop and script
-                exit 0
-              fi
-              sleep $check_interval
-            done        
-            gh run cancel ${{ github.run_id }}
-    approval_job:
-      name: "Approval Run"
-      runs-on: ubuntu-latest
-      environment: approval
-      steps:
-      - name: Approved for Deployment
-        run: |
-          echo "Deployment approved"
-    db_update:
-      name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-latest
-      needs: [approval_job]
-      defaults:
-        run:
-          shell: bash
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v2
-          #with:
-            #fetch-tags: 'true'
-            #ref: ${{ github.event.inputs.release-version }}
 
-        - name: Set Variables
-          run: |
-            echo "Job1"
-
-    post_db_update:
-      name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
-      needs: [approval_job,db_update]
-      if: success()
-      runs-on: ubuntu-latest
-      defaults:
-        run:
-          shell: bash
-      steps:
-        - name: Set Application Properties File
-          run: |
-           echo "Job2"
-        
-    rollback_db_update:
-      name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-      environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: ubuntu-latest
-      needs: [db_update, approval_job]
-      #if: failure()
-      if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result == 'success' }}
-
-      defaults:
-        run:
-          shell: bash
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v2
-          #with:
-            #fetch-tags: 'true'
-            #ref: ${{ github.event.inputs.release-version }}
-
-        - name: Set Variables
-          run: |
-            echo "Job3"
+  create-envfile:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DEBUG: false
+        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        file_name: env.txt
+        fail_on_empty: false
+        sort_keys: false
+    - uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: env.txt
