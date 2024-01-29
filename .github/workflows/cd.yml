@@ -131,11 +131,15 @@ jobs:
         # Patient Interface
         envkey_patient.interface.user: "12Bcgy"
         envkey_patient.interface.pass: "HiHello#123=as"
-        file_name: env.txt
+        file_name: secrets.properties
         fail_on_empty: false
         sort_keys: false
-    - run: sed -i 's/\(.*=\)\(.*\)/\1\L\2/' env.txt
+    - name: Set Application Properties File
+      run: |
+            echo ${{ vars.APPLICATION_PROPERTIES }} >> conf.txt
+            echo `cat secrets.properties` >> conf.txt
+           
     - uses: actions/upload-artifact@v4
       with:
         name: my-artifact
-        path: env.txt
+        path: conf.txt
