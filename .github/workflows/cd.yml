@@ -123,8 +123,14 @@ jobs:
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
       with:
-        envkey_DEBUG: false
         envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        # Add variable name with prefix "envkey_<VARIABLE-NAME>".
+        # Order (aka Refill) Interface
+        envkey_order.interface.user: ${{ secrets.SECRET_KEY }}
+        envkey_order.interface.pass: "ABCchd"
+        # Patient Interface
+        envkey_patient.interface.user: "12Bcgy"
+        envkey_patient.interface.pass: "HiHello#123=as"
         file_name: env.txt
         fail_on_empty: false
         sort_keys: false
