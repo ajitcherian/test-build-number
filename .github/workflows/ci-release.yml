@@ -81,6 +81,6 @@ jobs:
         if: github.ref == 'refs/heads/main' || contains(github.ref, 'release') || startsWith(github.ref, 'refs/heads/releases/FHIR')
         with:
           prerelease: true
-          tag: test-master-${{ github.run_number }}
+          tag: test-test-release-${{ github.run_number }}
           token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
           commit: ${{ github.sha }}
