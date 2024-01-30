@@ -30,41 +30,41 @@ jobs:
       #      echo "RUN_NUMBER_WITH_OFFSET=`echo ${RUN_NUMBER_WITH_OFFSET}`" >> $GITHUB_ENV 
       # - name: Runner number for artifact
       #   run: echo "Runner number for artifact is $RUN_NUMBER_WITH_OFFSET"
-      - name: Increase build
-        run: |
-            secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
-            list_secret_names=$(gh secret list -e qa | awk '{print $1}')
-            for secret_name in "${secrets_to_delete[@]}"; do
-              if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
-                echo "Secret exists, deleting..."
-                gh secret delete $secret_name -e qa
-                if [ $? -eq 0 ]; then
-                  echo "Secret deleted successfully."
-                else
-                  echo "Failed to delete secret."
-                fi
-              else
-                echo "Secret does not exist."
-              fi
-            done
-            echo "delete global"
-            secrets_to_delete=(LMDA LYNX_KEY SERVER_USERNAME TEST_KEY TEST_MASTER_IP TEST_SLAVE_IPS VAR1 VAR2 VAR3)
-            list_secret_names=$(gh secret list | awk '{print $1}')
-            for secret_name in "${secrets_to_delete[@]}"; do
-              if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
-                echo "Secret exists, deleting..."
-                gh secret delete $secret_name
-                if [ $? -eq 0 ]; then
-                  echo "Secret deleted successfully."
-                else
-                  echo "Failed to delete secret."
-                fi
-              else
-                echo "Secret does not exist."
-              fi
-            done          
-            gh secret list -e qa
-            gh secret list
+      # - name: Increase build
+      #   run: |
+      #       secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
+      #       list_secret_names=$(gh secret list -e qa | awk '{print $1}')
+      #       for secret_name in "${secrets_to_delete[@]}"; do
+      #         if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
+      #           echo "Secret exists, deleting..."
+      #           gh secret delete $secret_name -e qa
+      #           if [ $? -eq 0 ]; then
+      #             echo "Secret deleted successfully."
+      #           else
+      #             echo "Failed to delete secret."
+      #           fi
+      #         else
+      #           echo "Secret does not exist."
+      #         fi
+      #       done
+      #       echo "delete global"
+      #       secrets_to_delete=(LMDA LYNX_KEY SERVER_USERNAME TEST_KEY TEST_MASTER_IP TEST_SLAVE_IPS VAR1 VAR2 VAR3)
+      #       list_secret_names=$(gh secret list | awk '{print $1}')
+      #       for secret_name in "${secrets_to_delete[@]}"; do
+      #         if [[ "$list_secret_names" =~ "$secret_name" ]]; then  # Check if MY_SECRET exists in the list
+      #           echo "Secret exists, deleting..."
+      #           gh secret delete $secret_name
+      #           if [ $? -eq 0 ]; then
+      #             echo "Secret deleted successfully."
+      #           else
+      #             echo "Failed to delete secret."
+      #           fi
+      #         else
+      #           echo "Secret does not exist."
+      #         fi
+      #       done          
+      #       gh secret list -e qa
+      #       gh secret list
       # - name: Create md
       #   run: echo "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})" > file.md
       # - name: Create Prerelease
@@ -76,3 +76,11 @@ jobs:
       #     makeLatest: true
       #     body: "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})"
 
+      - name: Create Prerelease
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/main' || contains(github.ref, 'release') || startsWith(github.ref, 'refs/heads/releases/FHIR')
+        with:
+          prerelease: true
+          tag: test-${{ github.run_number }}
+          token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
+          #commit: ${{ env.GITHUB_SHA }}
