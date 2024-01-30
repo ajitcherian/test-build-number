@@ -83,4 +83,4 @@ jobs:
           prerelease: true
           tag: test-test-release-${{ github.run_number }}
           #token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
-          commit: ${{ github.sha }}
+          #commit: ${{ github.sha }}
