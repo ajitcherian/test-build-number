@@ -83,5 +83,5 @@ jobs:
       #     prerelease: true
       #     tag: test-${{ github.run_number }}
       #     token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
-      #     #commit: ${{ env.GITHUB_SHA }}
-      - run: echo "commit ${{ env.GITHUB_SHA }}"
+      #     #commit: $GITHUB_SHA
+      - run: echo "$GITHUB_SHA"
