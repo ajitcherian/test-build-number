@@ -1,9 +1,9 @@
 name: ci_pipeline
 
-on:
-  push:
-    branches:
-      - '*'
+# on:
+#   push:
+#     branches:
+#       - '*'
   # workflow_dispatch:
   #   inputs:
   #     enabled_veracode_run:
@@ -11,16 +11,84 @@ on:
   #       type: boolean
   #       required: true
   #       default: false
+name: POC | Lower Environment Deployment Workflow
+
+on:      
+  workflow_dispatch:
+    inputs:
+      release-version:
+        type: choice
+        description: 'TAG_NUMBER'
+        required: true
+        options:
+          - lynx-release-6.1.1-2023-11-22-229822-105
+          - lynx-release-6.2.1-2023-11-22-229822-106
+          - lynx-release-6.3.1-2023-11-23-229822-107
+          - lynx-release-6.3.1-2023-11-24-229822-108  
+          - lynxmobile-replica-release-6.11-11-11-2023-229822-106
+          - 0.1074.release_lynx-RELEASE_6.13.2
+          - 0.1023.release_lynx-RELEASE_6.12
+          - 0.1055.release_lynx-RELEASE_6.13.1
+          - 0.1020.release_lynx-RELEASE_6.13.4
+          - 0.1019.release_lynx-RELEASE_6.13.3
+          - 0.1018.release_lynx-RELEASE_6.13.1
+          - 0.1017.release_lynx-RELEASE_6.12
+          - lynx-release-6.1.1-2023-11-22-229822-105
+          - lynx-release-6.2.1-2023-11-22-229822-106
+          - lynx-release-6.3.1-2023-11-23-229822-107
+          - lynx-release-6.3.1-2023-11-24-229822-108  
+          - lynxmobile-replica-release-6.11-11-11-2023-229822-106
+          - 0.1074.release_lynx-RELEASE_6.13.2
+          - 0.1023.release_lynx-RELEASE_6.12
+          - 0.1055.release_lynx-RELEASE_6.13.1
+          - 0.1020.release_lynx-RELEASE_6.13.4
+          - 0.1019.release_lynx-RELEASE_6.13.3
+          - 0.1018.release_lynx-RELEASE_6.13.1
+          - 0.1017.release_lynx-RELEASE_6.12
+          
+      database-update: 
+        description: 'Select the environment if a database update needed. If not then select "false".'
+        type: choice
+        required: false
+        default: 'false'
+        options:
+        - 'false'
+        - LMDA
+        - LMDB
+        - LMDC
+        - LYNXDEV
+        - LMPERF
+        - LYNXQA1
+        - LYNXALPHA
+        - LYNXPERF
+        - LYNXPREVIEW
+        - LYNXQA
+      deploy-environment:
+        type: choice
+        description: 'Choose environment'
+        options:
+          - qa
+          - alpha
+          - perf
+          - preview
+        required: true
+        default: 'qa'
+      only-copy-property-file:
+        type: choice
+        required: true
+        options:
+            - 'false'
+            - 'true'
 #run-name: Custom name
 jobs:
   set_env:
     name: Setup Global Environments
     runs-on: ubuntu-latest
     permissions: write-all
-    env:
-      DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
-      JFROG_REPO_NAME: "ontada-fhir-service"
-      GH_TOKEN: ${{ secrets.SECRET }} #${{ github.token }}
+    # env:
+    #   DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
+    #   JFROG_REPO_NAME: "ontada-fhir-service"
+    #   GH_TOKEN: ${{ secrets.SECRET }} #${{ github.token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -76,11 +144,11 @@ jobs:
       #     makeLatest: true
       #     body: "[Build ${{ github.run_number }}](https://github.com/ajitcherian/test-build-number/actions/runs/${{ github.run_id }})"
 
-      - name: Create Prerelease
-        uses: ncipollo/release-action@v1
-        if: github.ref == 'refs/heads/main' || contains(github.ref, 'release') || startsWith(github.ref, 'refs/heads/releases/FHIR')
-        with:
-          prerelease: true
-          tag: test-master-${{ github.run_number }}
-          token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
-          commit: ${{ github.sha }}
+      # - name: Create Prerelease
+      #   uses: ncipollo/release-action@v1
+      #   if: github.ref == 'refs/heads/main' || contains(github.ref, 'release') || startsWith(github.ref, 'refs/heads/releases/FHIR')
+      #   with:
+      #     prerelease: true
+      #     tag: test-master-${{ github.run_number }}
+      #     token: ${{ secrets.SECRET }} #${{ secrets.GITHUB_TOKEN }}
+      #     commit: ${{ github.sha }}
