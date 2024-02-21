@@ -82,7 +82,7 @@ jobs:
     deploy:
       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: kube-deploy
+      runs-on: ubuntu-latest #kube-deploy
       defaults:
         run:
           shell: bash
