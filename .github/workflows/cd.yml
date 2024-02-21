@@ -108,8 +108,8 @@ jobs:
                 echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
                 echo "BUILD_NUMBER=`echo ${BUILD_NUMBER}`" >> $GITHUB_ENV
                 echo "CHECKOUT_BRANCH=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
-                WAR_FILE_FOLDER=`echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//'`
-                JFROG_PATH_WAR=`echo ${WAR_FILE_FOLDER}/${{ env.TAG_NUMBER }}.war`
+                # WAR_FILE_FOLDER=`echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//'`
+                JFROG_PATH_WAR=`echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//'/${{ env.TAG_NUMBER }}.war`
                 echo "JFROG_PATH_WAR=`echo ${JFROG_PATH_WAR}`" >> $GITHUB_ENV
                 releaseNumber=echo "${{ env.TAG_NUMBER }}" | awk -F_ '{print $NF}'
                 
