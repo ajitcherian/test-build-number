@@ -1,145 +1,344 @@
-# name: "Production CD Workflow"
+name: "Non-PROD CD Workflow"
 
-# on:      
-#   workflow_dispatch:
-#     inputs:
-#       deploy-environment:
-#         type: choice
-#         description: 'Choose environment'
-#         options:
-#           - prod
-#         required: true
-#         default: 'prod'
-# env:
-#   ENV: "${{ github.event.inputs.deploy-environment }}"
+on:
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: choice
+        description: 'Choose environment'
+        options:
+          - choose
+          - qa
+          - alpha
+          - perf-poc
+          - preview
+          - perf-cloud
+        required: true
+        default: 'choose'
 
-# jobs:
-#     wait_job:
-#       name: "Wait for approval to deploy on Prod environment"
-#       runs-on: ubuntu-latest
-#       permissions: write-all
-#       steps:
-#         -
-#           name: Get Code
-#           uses: actions/checkout@v2
-#           if: contains(github.event.inputs.deploy-environment, 'prod')
-#         - name: "Check and Cancel Job"
-#           if: contains(github.event.inputs.deploy-environment, 'prod')
-#           env:
-#             GH_TOKEN: ${{ github.token }}
-#           run: |
-#             total_sleep_time=30 # Total sleep time in seconds
-#             check_interval=15    # Check interval in seconds
-         
-#             # Calculate the number of iterations needed
-#             iterations=$((total_sleep_time / check_interval))
-          
-#             # Loop for the specified number of iterations
-#             for ((i = 0; i < iterations; i++)); do
-#               status=$(gh run view ${{ github.run_id }} --json status | jq -r .status)
-          
-#               if [ "$status" != "waiting" ]; then
-#                 total_sleep_time=300 # New total sleep time in seconds
-#                 # Exit the loop and script
-#                 exit 0
-#               fi
-#               sleep $check_interval
-#             done        
-#             gh run cancel ${{ github.run_id }}
-#     approval_job:
-#       name: "Approval Run"
-#       runs-on: ubuntu-latest
-#       environment: approval
-#       steps:
-#       - name: Approved for Deployment
-#         run: |
-#           echo "Deployment approved"
-#     db_update:
-#       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-#       environment: ${{ github.event.inputs.deploy-environment }}
-#       runs-on: ubuntu-latest
-#       needs: [approval_job]
-#       defaults:
-#         run:
-#           shell: bash
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v2
-#           #with:
-#             #fetch-tags: 'true'
-#             #ref: ${{ github.event.inputs.release-version }}
+      release-version:
+        description: 'TAG_NUMBER'
+        required: true
+        type: choice
+        default: "lynx-releases-6.14.1-2023-12-04-080835-581"
+        options:
+          - lynx-release-6.14.0.0-2024-02-06-085325-65
+          - lynx-web-0.1122.release_lynx-RELEASE_6.15
+          - lynx-web-0.1121.release_lynx-RELEASE_6.15
+          - lynx-web-0.1120.release_lynx-RELEASE_6.14.0.2
+          - lynx-web-0.1119.release_lynx-RELEASE_6.15
+          - lynx-web-0.1118.release_lynx-RELEASE_6.15
+          - lynx-web-0.1117.release_lynx-RELEASE_6.14.0.2
+          - lynx-web-0.1116.release_lynx-RELEASE_6.15
+          - lynx-web-0.1115.release_lynx-RELEASE_6.14.0.2
+          - lynx-web-0.1114.release_lynx-RELEASE_6.14.0.2
+          - lynx-web-0.1113.release_lynx-RELEASE_6.15
+          - lynx-web-0.1112.release_lynx-RELEASE_6.14.0.1
+          - lynx-web-0.1111.release_lynx-RELEASE_6.15
+          - lynx-web-0.1110.release_lynx-RELEASE_6.14.0.1
+          - lynx-web-0.1109.release_lynx-RELEASE_6.15
+          - lynx-web-0.1108.release_lynx-RELEASE_6.14
 
-#         - name: Set Variables
-#           run: |
-#             echo "Job1"
+      database-update:
+        description: 'Select the environment if a database update needed. If not then select "false".'
+        type: choice
+        required: false
+        default: 'false'
+        options:
+          - 'false'
+          - LMDA
+          - LMDB
+          - LMDC
+          - LYNXDEV
+          - LMPERF
+          - LYNXQA1
+          - LYNXALPHA
+          - LYNXPERF
+          - LYNXPREVIEW
+          - LYNXQA
 
-#     post_db_update:
-#       name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-#       environment: ${{ github.event.inputs.deploy-environment }}
-#       needs: [approval_job,db_update]
-#       if: success()
-#       runs-on: ubuntu-latest
-#       defaults:
-#         run:
-#           shell: bash
-#       steps:
-#         - name: Set Application Properties File
-#           run: |
-#            echo "Job2"
-        
-#     rollback_db_update:
-#       name: "Rollback in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
-#       environment: ${{ github.event.inputs.deploy-environment }}
-#       runs-on: ubuntu-latest
-#       needs: [db_update, approval_job]
-#       #if: failure()
-#       if: ${{ needs.db_update.result == 'failure' && needs.approval_job.result == 'success' }}
+      only-copy-property-file:
+        type: boolean
+        required: true
+        default: false
 
-#       defaults:
-#         run:
-#           shell: bash
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v2
-#           #with:
-#             #fetch-tags: 'true'
-#             #ref: ${{ github.event.inputs.release-version }}
-
-#         - name: Set Variables
-#           run: |
-#             echo "Job3"
-
-name: Create envfile
-
-on: [ push ]
+env:
+  TAG_NUMBER: "${{ github.event.inputs.release-version }}"
+  DATABASE_UPDATE: "${{ github.event.inputs.database-update }}"
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+  PROPERTY_FILE_CHANGE: "${{ github.event.inputs.only-copy-property-file }}"
+  # Lynx artifactory path
+  JFROG_REGISTRY: "https://mck.jfrog.io" #"https://mck-ontada-sre.jfrog.io"
+  JFROG_REPO_NAME: "lynx-generic-local" #"ontada-sre"
+  JFROG_GROUP_ID: "lynx/lynx-web" #"ontada-fhir-service-developer-replica"
+  CONFIG_FOLDER_PATH: /tmp/ #"/shared/qa/config/"
+  PROJECT_NAME: "lynx"
+  WORKFLOW_FOLDER_NAME: "lynx-web/target"
+  SERVER_USERNAME: "root"
+  SSH_PRIVATE_KEY: ${{ secrets.LYNX_KEY }}
+  CURRENT_DEPLOYMENT: ${{ vars.CURRENT_DEPLOYMENT }}
 
 jobs:
+    deploy:
+      name: "Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
+      environment: ${{ github.event.inputs.deploy-environment }}
+      runs-on: kube-deploy
+      defaults:
+        run:
+          shell: bash
+      container:
+        image: mehulsharma20/sqlplus:v9_github-cli_mvn_curl # mehulsharma20/sqlplus:v8_github-cli  , mck-ontada-sre.jfrog.io/sqlplus/sqlplus:archlinux_base
+        options: --user root
+        # credentials:
+        #     username: ${{ secrets.DEV_PORTAL_JFROG_USERNAME }}
+        #     password: ${{ secrets.DEV_PORTAL_JFROG_API_KEY }}
 
-  create-envfile:
- 
-    runs-on: ubuntu-latest
- 
-    steps:
-    - name: Make envfile
-      uses: SpicyPizza/create-envfile@v2.0
-      with:
-        envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        # Add variable name with prefix "envkey_<VARIABLE-NAME>".
-        # Order (aka Refill) Interface
-        envkey_order.interface.user: ${{ secrets.SECRET_KEY }}
-        envkey_order.interface.pass: "ABCchd"
-        # Patient Interface
-        envkey_patient.interface.user: "12Bcgy"
-        envkey_patient.interface.pass: "HiHello#123=as"
-        file_name: secrets.properties
-        fail_on_empty: false
-        sort_keys: false
-    - name: Set Application Properties File
-      run: |
-            echo ${{ vars.APPLICATION_PROPERTIES }} >> conf.txt
-            cat secrets.properties >> conf.txt
-           
-    - uses: actions/upload-artifact@v4
-      with:
-        name: my-artifact
-        path: conf.txt
+      steps:
+        - name: Set Variables
+          run: |
+            # If release name has release/FHIR it will modify it to release-FHIR.
+            PROJECT_NAME="lynx"
+            input="${{ env.TAG_NUMBER}}"
+            echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
+            # Check if input matches the expected format
+            if [[ $input =~ ^$PROJECT_NAME-web-([0-9]{1}).([0-9]{4}).(.*?)* ]]; then
+                # Extract build number and branch name from BASH_REMATCH array
+                BRANCH_NAME=$(echo "${BASH_REMATCH[3]}" | sed 's/release_\(lynx-RELEASE_[0-9.]*\)/release\/\1/')
+                BUILD_NUMBER="${BASH_REMATCH[2]}"
+                echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
+                echo "BUILD_NUMBER=`echo ${BUILD_NUMBER}`" >> $GITHUB_ENV
+                echo "CHECKOUT_BRANCH=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
+                WAR_FILE_FOLDER=echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//'
+                echo "JFROG_PATH_WAR=`echo ${WAR_FILE_FOLDER}/${{ env.TAG_NUMBER }}.war`" >> $GITHUB_ENV
+                releaseNumber=echo "${{ env.TAG_NUMBER }}" | awk -F_ '{print $NF}'
+            elif [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+              BRANCH_NAME=$(echo "${BASH_REMATCH[1]}" | sed 's/\//-/g')
+              releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
+              echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
+              echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV
+              echo "CHECKOUT_BRANCH=`echo ${{ env.TAG_NUMBER}}`" >> $GITHUB_ENV
+              echo "JFROG_PATH_WAR=`echo echo "${BASH_REMATCH[1]}" | cut -d- -f 2/${{ env.TAG_NUMBER }}.war`" >> $GITHUB_ENV
+            else
+                echo "Invalid input format: $input"
+            fi
+            echo $PROJECT_NAME $BRANCH_NAME
+            mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
+            
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+          #with:
+            #fetch-tags: 'true'
+            #ref: ${{ env.CHECKOUT_BRANCH }}
+        - name: Check vars
+          run: |
+             echo "Jfrog path ${{ env.JFROG_PATH_WAR }}"
+             echo "checkout branch ${{ env.CHECKOUT_BRANCH }}"
+             echo "release number ${{ env.releaseNumber }}"
+             echo " build number ${{ env.BUILD_NUMBER }}"
+
+        # - name: Set Credentials for Jfrog Artifact
+        #   if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   uses: jfrog/setup-jfrog-cli@v3
+        #   env:
+        #     JF_URL: ${{ env.JFROG_REGISTRY }}
+        #     JF_USER: ${{ secrets.DEV_PORTAL_JFROG_USERNAME }}
+        #     JF_PASSWORD: ${{ secrets.DEV_PORTAL_JFROG_API_KEY }}
+
+        # - name: Download Artifact
+        #   if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   run: |
+        #     #Download artifact and move to target folder
+        #     #lynx-generic-local/lynx/lynx-web/release-6.14.0.0/
+        #     #jf rt dl lynx-generic-local/lynx/lynx-web/0.1074.release_lynx-RELEASE_6.13.2/lynx-web-0.1074.release_lynx-RELEASE_6.13.2.war tmp/
+            
+        #     # jf rt dl ${{ env.JFROG_REPO_NAME }}/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/${{ env.TAG_NUMBER }}.war tmp/
+
+        #     # cp tmp/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/${{ env.TAG_NUMBER }}.war ${{ env.WORKFLOW_FOLDER_NAME }}/lynxmobileWeb.war
+        #     # cp tmp/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/${{ env.TAG_NUMBER }}.war ${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war
+
+        #     #jf rt dl ${{ env.JFROG_REPO_NAME }}/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/${{ env.TAG_NUMBER }}.war tmp/
+        #     #ls -lh tmp/${{ env.JFROG_REPO_NAME }}/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/
+        #     #mv tmp/${{ env.JFROG_REPO_NAME }}/${{ env.JFROG_GROUP_ID }}/${{ env.BRANCH_NAME }}/${{ env.TAG_NUMBER }}.war ${{ env.WORKFLOW_FOLDER_NAME }}
+        #     cp lynxtestworkflow.war ${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war
+        #     #cp lynxtestworkflow.war ${{ env.WORKFLOW_FOLDER_NAME }}/${{ env.TAG_NUMBER }}.war
+        #     #cp lynxtestworkflow.war ${{ env.WORKFLOW_FOLDER_NAME }}/lynxmobileWeb.war
+        #     cp change_control/jenkins-wildfly-deploy/pom.xml ${{ env.WORKFLOW_FOLDER_NAME }}
+        #     ls -la ${{ env.WORKFLOW_FOLDER_NAME }}
+
+        # - name: Set Java and Maven
+        #   if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   run: |
+        #     # pacman -Sc --noconfirm 
+        #     pacman -Sy archlinux-keyring --noconfirm
+        #     #pacman -Syu --noconfirm
+        #     pacman -S jdk17-openjdk curl maven --noconfirm
+        #     mvn --version
+
+        # - name: Undeploy to WildFly
+        #   if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   run: |
+        #     cd ${{ env.WORKFLOW_FOLDER_NAME }}
+        #     mvn \
+        #     -Dwildfly.hostname=${{ secrets.WILDFLY_HOSTNAME }} \
+        #     -Dwildfly.port=${{ secrets.WILDFLY_PORT }} \
+        #     -Dwildfly.username=${{ secrets.WILDFLY_USERNAME }} \
+        #     -Dwildfly.password=${{ secrets.WILDFLY_PASSWORD }} \
+        #     -Dwar.file.name=${{ env.CURRENT_DEPLOYMENT }}.war \
+        #     wildfly:undeploy -P ${{ env.ENV }}
+        #     cd ../../
+
+        #     #-Dwar.file.name=${{ env.TAG_NUMBER }}.war 
+
+        # - name: Database Changes
+        #   if: ${{ github.event.inputs.database-update != 'false' && env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   run: |
+        #     echo "Project Name is: $PROJECT_NAME"
+        #     input="${{ env.TAG_NUMBER}}"
+        #     if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+        #       BRANCH_NAME="${BASH_REMATCH[1]}"
+        #       echo $BRANCH_NAME
+        #       releaseNumber=$(echo "${BASH_REMATCH[1]}" | cut -d- -f 2)
+        #       echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV  
+        #     else
+        #       echo "TAG Number is not matching correct format so not able to get release number."
+        #       exit 1
+        #     fi
+        #     echo "Relase Number is: $releaseNumber"
+        #     echo "####### Installing JQ #######"
+        #     curl -LO https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+        #     mv jq-linux64 jq
+        #     chmod +x jq
+        #     cp jq /usr/bin
+        #     jq --version
+        #     echo ${{ toJSON(secrets[github.event.inputs['database-update']]) }} > db_creds.json
+
+        #     DB_HOSTNAME=$(cat db_creds.json | jq -r '.oracle_db_hostname')
+        #     echo ::add-mask::$DB_HOSTNAME
+        #     echo DB_HOSTNAME="$DB_HOSTNAME" >> $GITHUB_ENV
+        #     export DB_HOSTNAME="$DB_HOSTNAME"
+
+        #     DB_HOSTPORT=$(cat db_creds.json | jq -r '.oracle_db_port')
+        #     echo ::add-mask::$DB_HOSTPORT
+        #     echo DB_HOSTPORT="$DB_HOSTPORT" >> $GITHUB_ENV
+        #     export DB_HOSTPORT="$DB_HOSTPORT"
+
+        #     SERVICE_NAME=$(cat db_creds.json | jq -r '.oracle_service_name')
+        #     echo ::add-mask::$SERVICE_NAME
+        #     echo SERVICE_NAME="$SERVICE_NAME" >> $GITHUB_ENV
+        #     export SERVICE_NAME="$SERVICE_NAME"
+
+        #     DB_USERNAME=$(cat db_creds.json | jq -r '.oracle_db_username')
+        #     echo ::add-mask::$DB_USERNAME
+        #     echo DB_USERNAME="$DB_USERNAME" >> $GITHUB_ENV
+        #     export DB_USERNAME="$DB_USERNAME"
+
+        #     DB_PASSWORD=$(cat db_creds.json | jq -r '.oracle_db_password')
+        #     echo ::add-mask::$DB_PASSWORD
+        #     echo DB_PASSWORD="$DB_PASSWORD" >> $GITHUB_ENV
+        #     export DB_PASSWORD="$DB_PASSWORD"
+
+        #     echo "${DB_HOSTNAME} ${DB_HOSTPORT} ${SERVICE_NAME} ${DB_USERNAME} ${DB_PASSWORD}"
+        #     echo "Run Database Update Command"
+        #     bash ./update_db.sh ${DATABASE_UPDATE} ${TAG_NUMBER} sql/CHECK_SQL_SCRIPT_EXISTS.sql sql/INSERT_SQL_SCRIPT.sql $releaseNumber
+
+        # - name: Make Secret File
+        #   uses: SpicyPizza/create-envfile@v2.0
+        #   with:
+        #     # Add variable name with prefix "envkey_<VARIABLE-NAME>".
+        #     # Add variable name with prefix "envkey_<VARIABLE-NAME>".
+        #     # Order (aka Refill) Interface
+        #     envkey_order.interface.user: ${{ secrets.order_interface_user }}
+        #     envkey_order.interface.pass: ${{ secrets.order_interface_pass }}
+        #     # Patient Interface
+        #     envkey_patient.interface.user: ${{ secrets.order_interface_user }}
+        #     envkey_patient.interface.pass: ${{ secrets.order_interface_pass }}
+        #     # Purge
+        #     envkey_purge.user: ${{ secrets.order_interface_user }}
+        #     envkey_purge.pass: ${{ secrets.order_interface_pass }}
+        #     # Customer Number Update
+        #     envkey_customer.number.update.user: ${{ secrets.order_interface_user }}
+        #     envkey_customer.number.update.pass: ${{ secrets.order_interface_pass }}
+        #     # MSH FTP config
+        #     envkey_msh.ftp.config.user: ${{ secrets.msh_ftp_config_user }}
+        #     envkey_msh.ftp.config.pass: ${{ secrets.msh_ftp_config_pass }}
+        #     # USP FTP config
+        #     envkey_usp.ftp.config.user: ${{ secrets.usp_ftp_config_user }}
+        #     envkey_usp.ftp.config.pass: ${{ secrets.usp_ftp_config_pass }}
+        #     # MBean login info
+        #     envkey_mbean.login.user: ${{ secrets.mbean_login_user }}
+        #     envkey_mbean.login.password: ${{ secrets.mbean_login_password }}
+        #     # Misc
+        #     envkey_lynx.encryption.key: ${{ secrets.lynx_encryption_key }}
+        #     # MSH SAP Sales Order Web Service
+        #     envkey_msh.sales.order.service.username: ${{ secrets.MSH_SALES_ORDER_SERVICE_USERNAME }}
+        #     envkey_msh.sales.order.service.password: ${{ secrets.MSH_SALES_ORDER_SERVICE_PASSWORD }}
+        #     envkey_msh.sales.order.service.api.key: ${{ secrets.MSH_SALES_ORDER_SERVICE_API_KEY }}
+        #     # MedSurg Integration
+        #     envkey_mms.purchase.order.service.sender.identity: ${{ secrets.MMS_PURCHASE_ORDER_SERVICE_SENDER_IDENTITY }}
+        #     envkey_mms.purchase.order.service.sender.shared.secret: ${{ secrets.MMS_PURCHASE_ORDER_SERVICE_SENDER_SHARED_SECRET }}
+        #     # CRM Handler Web Service
+        #     envkey_crm.handler.service.username: ${{ secrets.CRM_HANDLER_SERVICE_USERNAME }}
+        #     envkey_crm.handler.service.password: ${{ secrets.CRM_HANDLER_SERVICE_PASSWORD }}
+        #     # ATTP Web Service for QA
+        #     envkey_attp.service.client.id: ${{ secrets.ATTP_SERVICE_CLIENT_ID }}
+        #     envkey_attp.service.client.secret: ${{ secrets.ATTP_SERVICE_CLIENT_SECRET }}
+        #     # MSH Buying Decision
+        #     envkey_msh.recomm.service.client.id: ${{ secrets.MSH_RECOMM_SERVICE_CLIENT_ID }}
+        #     envkey_msh.recomm.service.client.secret: ${{ secrets.MSH_RECOMM_SERVICE_CLIENT_SECRET }}
+        #     # Okta
+        #     envkey_okta.client.id: ${{ secrets.OKTA_CLIENT_ID }}
+        #     envkey_okta.api.token: ${{ secrets.OKTA_API_TOKEN }}
+        #     # Below are variable for the module
+        #     file_name: secrets.properties
+        #     fail_on_empty: false
+        #     sort_keys: false
+
+        # - name: Set Application Properties File
+        #   run: |
+        #     echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+        #     cat secrets.properties >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+        #     echo "lynx.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+        #     echo "app.version=`echo ${{ github.run_number }}`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+
+        # - name: Copy Application Config Files at Common Location
+        #   uses: appleboy/scp-action@master
+        #   with:
+        #     host: ${{ secrets.MASTER_CONTROLLER_IP }}
+        #     username: ${{ env.SERVER_USERNAME }}
+        #     key: ${{ env.SSH_PRIVATE_KEY }}
+        #     source: ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+        #     target: ${{ env.CONFIG_FOLDER_PATH }}
+        #     strip_components: 3
+
+        # - name: Deploy to WildFly
+        #   if: ${{ env.PROPERTY_FILE_CHANGE != 'true' }}
+        #   run: |
+        #     cd ${{ env.WORKFLOW_FOLDER_NAME }}
+        #     mvn \
+        #     -Dwildfly.hostname=${{ secrets.WILDFLY_HOSTNAME }} \
+        #     -Dwildfly.port=${{ secrets.WILDFLY_PORT }} \
+        #     -Dwildfly.username=${{ secrets.WILDFLY_USERNAME }} \
+        #     -Dwildfly.password=${{ secrets.WILDFLY_PASSWORD }} \
+        #     -Dwar.file.name=${{ env.TAG_NUMBER }}.war \
+        #     wildfly:deploy -P ${{ env.ENV }}
+        #     cd ../../
+
+        # - name: Updating Variable with Current Deployment Number
+        #   run: |
+        #     gh api \
+        #     --method PATCH \
+        #     -H "Accept: application/vnd.github+json" \
+        #     -H "X-GitHub-Api-Version: 2022-11-28" \
+        #     /repos/mckesson/lynxmobile/environments/${{ env.ENV }}/variables/CURRENT_DEPLOYMENT \
+        #     -f name='CURRENT_DEPLOYMENT' \
+        #     -f value='${{ env.TAG_NUMBER }}'
+        #   env:
+        #     GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+
+        # # # - name: Microsoft Teams Notification
+        # # #   run: |
+        # # #     if [ "${{ env.PROPERTY_FILE_CHANGE }}" == 'false' ]; then
+        # # #       curl -X POST -H "Content-Type: application/json" -d '{ "text": "'"Deployed Release  ${{ env.TAG_NUMBER }}  Environment ${{ env.ENV }}"'"}' ${{ secrets.MSTEAMS_WEBHOOK }}
+        # # #     else
+        # # #       curl -X POST -H "Content-Type: application/json" -d '{ "text": "'"Update Application Override Property file for Release  ${{ env.TAG_NUMBER }}  Environment ${{ env.ENV }}"'"}' ${{ secrets.MSTEAMS_WEBHOOK }}
+        # # #     fi
