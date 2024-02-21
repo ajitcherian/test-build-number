@@ -108,7 +108,7 @@ jobs:
                 echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
                 echo "BUILD_NUMBER=`echo ${BUILD_NUMBER}`" >> $GITHUB_ENV
                 echo "CHECKOUT_BRANCH=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
-                WAR_FILE_FOLDER=$(echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//')
+                WAR_FILE_FOLDER=`echo "${{ env.TAG_NUMBER }}" | sed 's/^lynx-web-//'`
                 echo "JFROG_PATH_WAR=`echo ${WAR_FILE_FOLDER}/${{ env.TAG_NUMBER }}.war`" >> $GITHUB_ENV
                 releaseNumber=echo "${{ env.TAG_NUMBER }}" | awk -F_ '{print $NF}'
                 
@@ -118,7 +118,7 @@ jobs:
               echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
               echo "releaseNumber=`echo ${releaseNumber}`" >> $GITHUB_ENV
               echo "CHECKOUT_BRANCH=`echo ${{ env.TAG_NUMBER}}`" >> $GITHUB_ENV
-              echo "JFROG_PATH_WAR=`echo "${BASH_REMATCH[1]}" | cut -d- -f 2/${{ env.TAG_NUMBER }}.war`" >> $GITHUB_ENV
+              echo "JFROG_PATH_WAR=`echo "release-$releaseNumber/${{ env.TAG_NUMBER }}.war`" >> $GITHUB_ENV
               echo "BUILD_NUMBER=`echo "${TAG_NUMBER}" | awk -F- '{print $NF}'`" >> $GITHUB_ENV
             else
                 echo "Invalid input format: $input"
