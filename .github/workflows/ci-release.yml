@@ -18,18 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     env:
-      DOCKER_REGISTRY: "mck-ontada-sre.jfrog.io"
-      JFROG_REPO_NAME: "ontada-fhir-service"
       GH_TOKEN: ${{ secrets.SECRET }} #${{ github.token }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Set Run Number
-        run: | 
-           RUN_NUMBER_WITH_OFFSET=$((1063 + ${{ github.run_number }}))
-           echo "RUN_NUMBER_WITH_OFFSET=`echo ${RUN_NUMBER_WITH_OFFSET}`" >> $GITHUB_ENV 
-      - name: Runner number for artifact
-        run: echo "Runner number for artifact is $RUN_NUMBER_WITH_OFFSET"
       - name: Increase build
         run: |
             # secrets_to_delete=(MASTER_CONTROLLER_IP SLAVE_CONTROLLER_IPS SLAVE_CONTROLLER_NAMES WILDFLY_HOSTNAME WILDFLY_PASSWORD WILDFLY_PORT	WILDFLY_USERNAME)
