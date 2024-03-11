@@ -15,10 +15,10 @@ jobs:
           envkey_VAR3: ${{ secrets.VAR3 }}
           envkey_VAR4: ${{ secrets.VAR4 }}
           # Below are variable for the module
-          file_name: secrets.properties
+          file_name: tmp-secrets.properties
           fail_on_empty: false
           sort_keys: false
-      - run: awk -F'=' '$2!=""' env-secrets.properties > secrets.properties
+      - run: awk -F'=' '$2!=""' tmp-secrets.properties > secrets.properties
       - uses: actions/upload-artifact@v4
         with:
           name: my-artifact
