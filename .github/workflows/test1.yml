@@ -1,6 +1,8 @@
 name: Predefined function
 on: 
-  workflow_dispatch:
+  # workflow_dispatch:
+  push:
+    branches: main
 
 jobs:
   job1:
@@ -8,9 +10,9 @@ jobs:
     steps:
       - uses: SpicyPizza/create-envfile@v2.0
         with:
-          envkey_VAR1: ${{ secrets.VAR1 }}
-          envkey_VAR2: ${{ secrets.VAR2 }}
-          envkey_VAR3: ${{ secrets.VAR3 }}
+          envkey_username: ${{ secrets.username }}
+          envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+          envkey_VAR3: ${{ secrets.OAUTH_USER_NAME }}
           # Below are variable for the module
           file_name: secrets.properties
           fail_on_empty: false
