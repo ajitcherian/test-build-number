@@ -17,6 +17,8 @@ jobs:
           file_name: secrets.properties
           fail_on_empty: false
           sort_keys: false
+      - run: |
+           echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
       - uses: actions/upload-artifact@v4
         with:
           name: my-artifact
