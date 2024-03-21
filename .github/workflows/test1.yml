@@ -17,16 +17,31 @@ jobs:
       #     file_name: secrets.properties
       #     fail_on_empty: false
       #     sort_keys: false
-      - name: Create .env file
-        uses: ozaytsev86/create-env-file@v1
-        with:
-          ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
-          ENV_ANOTHER_KEY: ${{ secrets.ANOTHER_KEY }}
-      - run: |
+      # - name: Create .env file
+      #   uses: ozaytsev86/create-env-file@v1
+      #   with:
+      #     ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+      #     ENV_ANOTHER_KEY: ${{ secrets.ANOTHER_KEY }}
+     - name: Create .env 🤫
+       uses: DeveloperRic/action-create-env@v1.0.2 # set this to the version of your choice
+       with:
+        directory: ${{ github.workspace }}
+        # Set this if you want the action to look in environment variables for extra content. This input is not required.
+        # Note: setting to false or any other value will still enable environment variable lookup.
+        # If you don't want this turned on, don't include the input.
+        include_env_vars: true
+       env:
+          # If `include_env_vars` is true, the following environment variables will be written to the .env file as:
+          # PROD=${{ secrets.PROD }}
+          # ACTION_CREATE_ENV_JOKE: ${{ secrets.ACTION_CREATE_ENV_JOKE }}
+          # Note: `full_text` is dumped to the .env file first and subsequently environment variables are dumped.
+          #       This means that duplicate entries may exist in the .env file.
+          ACTION_CREATE_ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+     - run: |
            echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
-      - uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
+     - uses: actions/upload-artifact@v4
+       with:
+        name: my-artifact
           # path: secrets.properties, .env
-          path: .env
+        path: .env
 
