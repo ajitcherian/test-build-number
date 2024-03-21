@@ -8,19 +8,24 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     steps:
-      - uses: SpicyPizza/create-envfile@v2.0
+      # - uses: SpicyPizza/create-envfile@v2.0
+      #   with:
+      #     envkey_username: ${{ secrets.username }}
+      #     envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+      #     envkey_VAR3: ${{ secrets.OAUTH_USER_NAME }}
+      #     # Below are variable for the module
+      #     file_name: secrets.properties
+      #     fail_on_empty: false
+      #     sort_keys: false
+      - name: Create .env file
+        uses: ozaytsev86/create-env-file@v1
         with:
-          envkey_username: ${{ secrets.username }}
-          envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
-          envkey_VAR3: ${{ secrets.OAUTH_USER_NAME }}
-          # Below are variable for the module
-          file_name: secrets.properties
-          fail_on_empty: false
-          sort_keys: false
+          ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+          ENV_ANOTHER_KEY: ${{ secrets.ANOTHER_KEY }}
       - run: |
            echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
       - uses: actions/upload-artifact@v4
         with:
           name: my-artifact
-          path: secrets.properties
+          path: secrets.properties, .env
 
