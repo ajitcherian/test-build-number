@@ -50,12 +50,19 @@ jobs:
      #        ACTION_CREATE_ENV_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
      #        # Captcha Configuration
      #        ACTION_CREATE_ENV_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
-     - name: Create Dotenv File
-       uses: actually-colab/github-action-create-env-file@v2.3
+     # - name: Create Dotenv File
+     #   uses: actually-colab/github-action-create-env-file@v2.3
+     #   with:
+     #      envkey_debug: false
+     #      envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+     #      file_name: .env
+     - name: Create .env file
+       uses: skiddph/actions-env@v1.0.3
        with:
-          envkey_debug: false
-          envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
-          file_name: .env
+        file: .env # default | a path or filename
+        prefix: 'ENV_' # default | must be uppercase
+       env:
+        ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
      - run: |
            echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
      - uses: actions/upload-artifact@v4
