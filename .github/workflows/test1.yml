@@ -22,34 +22,42 @@ jobs:
       #   with:
       #     ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
       #     ENV_ANOTHER_KEY: ${{ secrets.ANOTHER_KEY }}
-     - name: Create .env 🤫
-       uses: DeveloperRic/action-create-env@v1.0.2 # set this to the version of your choice
+     # - name: Create .env 🤫
+     #   uses: DeveloperRic/action-create-env@v1.0.2 # set this to the version of your choice
+     #   with:
+     #    directory: ${{ github.workspace }}
+     #    # Set this if you want the action to look in environment variables for extra content. This input is not required.
+     #    # Note: setting to false or any other value will still enable environment variable lookup.
+     #    # If you don't want this turned on, don't include the input.
+     #    include_env_vars: true
+     #   env:
+     #      # If `include_env_vars` is true, the following environment variables will be written to the .env file as:
+     #      # PROD=${{ secrets.PROD }}
+     #      # ACTION_CREATE_ENV_JOKE: ${{ secrets.ACTION_CREATE_ENV_JOKE }}
+     #      # Note: `full_text` is dumped to the .env file first and subsequently environment variables are dumped.
+     #      #       This means that duplicate entries may exist in the .env file.
+     #        ACTION_CREATE_ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+     #        ACTION_CREATE_ENV_username: ${{ secrets.APP_USERNAME }}
+     #        ACTION_CREATE_ENV_password: ${{ secrets.APP_PASSWORD }}
+     #        ACTION_CREATE_ENV_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
+     #        ACTION_CREATE_ENV_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
+     #        ACTION_CREATE_ENV_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
+     #        # These credentials are used multiple places
+     #        ACTION_CREATE_ENV_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
+     #        ACTION_CREATE_ENV_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
+     #        # Openid connect application db connection
+     #        ACTION_CREATE_ENV_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
+     #        ACTION_CREATE_ENV_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
+     #        # Captcha Configuration
+     #        ACTION_CREATE_ENV_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
+     - name: Create Dotenv File
+       uses: actually-colab/github-action-create-env-file@v2.3
        with:
-        directory: ${{ github.workspace }}
-        # Set this if you want the action to look in environment variables for extra content. This input is not required.
-        # Note: setting to false or any other value will still enable environment variable lookup.
-        # If you don't want this turned on, don't include the input.
-        include_env_vars: true
-       env:
-          # If `include_env_vars` is true, the following environment variables will be written to the .env file as:
-          # PROD=${{ secrets.PROD }}
-          # ACTION_CREATE_ENV_JOKE: ${{ secrets.ACTION_CREATE_ENV_JOKE }}
-          # Note: `full_text` is dumped to the .env file first and subsequently environment variables are dumped.
-          #       This means that duplicate entries may exist in the .env file.
-            ACTION_CREATE_ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
-            ACTION_CREATE_ENV_username: ${{ secrets.APP_USERNAME }}
-            ACTION_CREATE_ENV_password: ${{ secrets.APP_PASSWORD }}
-            ACTION_CREATE_ENV_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
-            ACTION_CREATE_ENV_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
-            ACTION_CREATE_ENV_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
-            # These credentials are used multiple places
-            ACTION_CREATE_ENV_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
-            ACTION_CREATE_ENV_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
-            # Openid connect application db connection
-            ACTION_CREATE_ENV_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
-            ACTION_CREATE_ENV_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
-            # Captcha Configuration
-            ACTION_CREATE_ENV_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
+          envkey_debug: false
+          envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
+        
+          directory: <directory_name>
+          file_name: .env
      - run: |
            echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
      - uses: actions/upload-artifact@v4
