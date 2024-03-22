@@ -94,11 +94,10 @@ jobs:
      - uses: actions/upload-artifact@v4
        with:
         name: my-artifact
-          # path: secrets.properties, .env
         path: .env
      - uses: actions/upload-artifact@v4
        with:
-        name: my-artifact
+        name: my-artifact2
           # path: secrets.properties, .env
         path: secrets.properties
 
