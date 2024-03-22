@@ -55,8 +55,6 @@ jobs:
        with:
           envkey_debug: false
           envkey_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
-        
-          directory: <directory_name>
           file_name: .env
      - run: |
            echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
