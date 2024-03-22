@@ -67,27 +67,38 @@ jobs:
         directory: ${{ github.workspace }}
         include_env_vars: true
        env:
-        ENV_reCaptcha.verification.secret: ${{ secrets.reCaptcha_verification_secret }}
         ACTION_CREATE_ENV_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
         ACTION_CREATE_ENV_OAUTH2_CLIENT_ID: "get value"
-        ACTION_CREATE_ENV_OAUTH2_CLIENT_SECRET: ${{ secrets.OAUTH2_CLIENT_SECRET }}
-        ACTION_CREATE_ENV_API_PORTAL_USERNAME: ${{ secrets.API_PORTAL_USERNAME }}
-        ACTION_CREATE_ENV_API_PORTAL_PASSWORD: ${{ secrets.API_PORTAL_PASSWORD }}
-        ACTION_CREATE_ENV_G2_EHR_SUPERUSER_NAME: ${{ secrets.G2_EHR_SUPERUSER_NAME }}
-        ACTION_CREATE_ENV_G2_EHR_SUPERUSER_PASSWORD: ${{ secrets.G2_EHR_SUPERUSER_PASSWORD }}
-        ACTION_CREATE_ENV_SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-        ACTION_CREATE_ENV_SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-        ACTION_CREATE_ENV_API_PORTAL_OAUTH2_CLIENT_ID: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_ID }}
         ACTION_CREATE_ENV_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
-        ACTION_CREATE_ENV_OKTA_OH_AUTH: ${{ secrets.OKTA_OH_AUTH }}
-        ACTION_CREATE_ENV_OKTA_OH_CLIENT_ID: ${{ secrets.OKTA_OH_CLIENT_ID }}
+        ACTION_CREATE_ENV_OKTA_OH_AUTH: ${{ secrets.BLANK }}
         ACTION_CREATE_ENV_NON_EMPTY: "not empty=1233"
         ACTION_CREATE_ENV_reCaptcha.verification.secret: "values"
+     - name: "Make secret file"
+       uses: skiddph/actions-env@v1.0.3
+       with:
+        file: secrets.properties
+        prefix: 'envkey_' # default | must be uppercase
+       env:
+        envkey_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
+        envkey_OAUTH2_CLIENT_ID: "get value"
+        envkey_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+        envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
+        envkey_ENV_NON_EMPTY: "not empty=1233"
+        envkey_reCaptcha.verification.secret: "values"
      - run: |
-           echo -n "reCaptcha.verification.secret=${{ secrets.reCaptcha_verification_secret }}" >> secrets.properties
+           echo "file create from DeveloperRic/action-create-env@v1.0.2"
+           cat .env
+           echo "###################################################"
+           echo "file create from skiddph/actions-env@v1.0.3"
+           echo secrets.properties
      - uses: actions/upload-artifact@v4
        with:
         name: my-artifact
           # path: secrets.properties, .env
         path: .env
+     - uses: actions/upload-artifact@v4
+       with:
+        name: my-artifact
+          # path: secrets.properties, .env
+        path: secrets.properties
 
