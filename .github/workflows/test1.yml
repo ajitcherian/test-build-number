@@ -83,14 +83,14 @@ jobs:
         envkey_OAUTH2_CLIENT_ID: "get value"
         envkey_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
         envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
-        envkey_ENV_NON_EMPTY: "not empty=1233"
+        envkey_NON_EMPTY: "not empty=1233"
         envkey_reCaptcha.verification.secret: "values"
      - run: |
            echo "file create from DeveloperRic/action-create-env@v1.0.2"
            cat .env
            echo "###################################################"
            echo "file create from skiddph/actions-env@v1.0.3"
-           echo secrets.properties
+           cat  secrets.properties
      - uses: actions/upload-artifact@v4
        with:
         name: my-artifact
