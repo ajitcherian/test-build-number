@@ -61,40 +61,41 @@ jobs:
      #   with:
      #    file: .env # default | a path or filename
      #    prefix: 'envkey_' # default | must be uppercase
-     - name: Make Secret File
-       uses: DeveloperRic/action-create-env@v1.0.2
-       with:
-        directory: ${{ github.workspace }}
-        include_env_vars: true
-       env:
-        ACTION_CREATE_ENV_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
-        ACTION_CREATE_ENV_OAUTH2_CLIENT_ID: "get value"
-        ACTION_CREATE_ENV_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
-        ACTION_CREATE_ENV_OKTA_OH_AUTH: ${{ secrets.BLANK }}
-        ACTION_CREATE_ENV_NON_EMPTY: "not empty=1233"
-        ACTION_CREATE_ENV_reCaptcha.verification.secret: "values"
-     - name: "Make secret file"
-       uses: skiddph/actions-env@v1.0.3
-       with:
-        file: secrets.properties
-        prefix: 'envkey_' # default | must be uppercase
-       env:
-        envkey_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
-        envkey_OAUTH2_CLIENT_ID: "get value"
-        envkey_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
-        envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
-        envkey_NON_EMPTY: "not empty=1233"
-        envkey_reCaptcha.verification.secret: "values"
+     # - name: Make Secret File
+     #   uses: DeveloperRic/action-create-env@v1.0.2
+     #   with:
+     #    directory: ${{ github.workspace }}
+     #    include_env_vars: true
+     #   env:
+     #    ACTION_CREATE_ENV_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
+     #    ACTION_CREATE_ENV_OAUTH2_CLIENT_ID: "get value"
+     #    ACTION_CREATE_ENV_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+     #    ACTION_CREATE_ENV_OKTA_OH_AUTH: ${{ secrets.BLANK }}
+     #    ACTION_CREATE_ENV_NON_EMPTY: "not empty=1233"
+     #    ACTION_CREATE_ENV_reCaptcha.verification.secret: "values"
+     # - name: "Make secret file"
+     #   uses: skiddph/actions-env@v1.0.3
+     #   with:
+     #    file: secrets.properties
+     #    prefix: 'envkey_' # default | must be uppercase
+     #   env:
+     #    envkey_FHIR_OAUTH_LOGIN_USERNAME: "Test value"
+     #    envkey_OAUTH2_CLIENT_ID: "get value"
+     #    envkey_API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+     #    envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
+     #    envkey_NON_EMPTY: "not empty=1233"
+     #    envkey_reCaptcha.verification.secret: "values"
      - run: |
-           echo "file create from DeveloperRic/action-create-env@v1.0.2"
-           cat .env
-           echo "###################################################"
-           echo "file create from skiddph/actions-env@v1.0.3"
-           cat  secrets.properties
-     - uses: actions/upload-artifact@v4
-       with:
-        name: my-artifact
-        path: .env
+           # echo "file create from DeveloperRic/action-create-env@v1.0.2"
+           # cat .env
+           # echo "###################################################"
+           # echo "file create from skiddph/actions-env@v1.0.3"
+           # cat  secrets.properties
+           echo "username=`echo ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}`" >> secrets.properties
+     # - uses: actions/upload-artifact@v4
+     #   with:
+     #    name: my-artifact
+     #    path: .env
      - uses: actions/upload-artifact@v4
        with:
         name: my-artifact2
