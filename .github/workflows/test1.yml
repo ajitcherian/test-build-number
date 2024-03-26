@@ -163,8 +163,8 @@ jobs:
      #      echo "hello"
      # - name: test
      #   run: echo ${{ steps.mysecret.id }}
-      - name: Make Secret File
-        run: |
+     - name: Make Secret File
+       run: |
             echo "username=`echo ${{ secrets.APP_USERNAME }}`" >> secrets-temp.properties
             echo "password=`echo ${{ secrets.APP_PASSWORD }}`" >> secrets-temp.properties
             echo "oauth2.clientId=`echo ${{ secrets.OAUTH2_CLIENT_ID }}`" >> secrets-temp.properties
