@@ -87,6 +87,15 @@ jobs:
      #    envkey_reCaptcha.verification.secret: "values"
      - env:
          API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+         APP_USERNAME: ${{ secrets.APP_USERNAME }}
+         APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+         OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
+         UI_CLIENT_ID: ${{ secrets.UI_CLIENT_ID }}
+         OAUTH2_USERNAME: ${{ secrets.OAUTH2_USERNAME }}
+         OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
+         OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
+         CAPTCHA_SECRET: ${{ secrets.CAPTCHA_SECRET }}
+         CAPTCHA_SITE_KEY: ${{ secrets.CAPTCHA_SITE_KEY }}
        run: |
            # echo "file create from DeveloperRic/action-create-env@v1.0.2"
            # cat .env
