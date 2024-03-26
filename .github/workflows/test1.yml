@@ -93,32 +93,32 @@ jobs:
            # cat  secrets.properties
            # echo "username=`echo ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}`" >> secrets.properties          
            # Define the array of secrets and their corresponding properties
-           secrets=(
-              "APP_USERNAME=username"
-              "APP_PASSWORD=password"
-              "OAUTH2_CLIENT_ID=oauth2.clientId"
-              "OAUTH2_CLIENT_SECRET=oauth2.clientSecret"
-              "UI_CLIENT_ID=ui.clientId"
-              "OAUTH2_USERNAME=oauth2.username"
-              "OAUTH2_PASSWORD=oauth2.password"
-              "OAUTH_USER_NAME=OAUTH_USER_NAME"
-              "OAUTH_PASSWORD=OAUTH_PASSWORD"
-              "CAPTCHA_SECRET=reCaptcha.verification.secret"
-              "CAPTCHA_SITE_KEY=reCaptcha.verification.siteKey"
-           )
-          
-           # Loop through the secrets array
-           for secret in "${secrets[@]}"; do
-              # Extract the secret name and property
-              secret_name="${secret%%=*}"
-              property="${secret#*=}"
-          
-              # Get the value of the secret from GitHub secrets
-              secret_value="${{ secrets.${secret_name} }}"
-          
-              # Write the property and its value to secrets.properties
-              echo "${property}=${secret_value}" >> secrets.properties
-           done
+             secrets=(
+                "APP_USERNAME=username"
+                "APP_PASSWORD=password"
+                "OAUTH2_CLIENT_ID=oauth2.clientId"
+                "OAUTH2_CLIENT_SECRET=oauth2.clientSecret"
+                "UI_CLIENT_ID=ui.clientId"
+                "OAUTH2_USERNAME=oauth2.username"
+                "OAUTH2_PASSWORD=oauth2.password"
+                "OAUTH_USER_NAME=OAUTH_USER_NAME"
+                "OAUTH_PASSWORD=OAUTH_PASSWORD"
+                "CAPTCHA_SECRET=reCaptcha.verification.secret"
+                "CAPTCHA_SITE_KEY=reCaptcha.verification.siteKey"
+             )
+            
+             # Loop through the secrets array
+             for secret in "${secrets[@]}"; do
+                # Extract the secret name and property
+                secret_name="${secret%%=*}"
+                property="${secret#*=}"
+            
+                # Get the value of the secret from GitHub secrets
+                secret_value="${{ secrets.${secret_name} }}"
+            
+                # Write the property and its value to secrets.properties
+                echo "${property}=${secret_value}" >> secrets.properties
+             done
 
      # - uses: actions/upload-artifact@v4
      #   with:
