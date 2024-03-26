@@ -132,23 +132,23 @@ jobs:
      #         done
      - env:
             # Add variable name with prefix "ACTION_CREATE_ENV_<VARIABLE-NAME>".
-            ACTION_CREATE_ENV_username: ${{ secrets.APP_USERNAME }}
-            ACTION_CREATE_ENV_password: ${{ secrets.APP_PASSWORD }}
-            ACTION_CREATE_ENV_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
-            ACTION_CREATE_ENV_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
-            ACTION_CREATE_ENV_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
+            envkey_username: ${{ secrets.APP_USERNAME }}
+            envkey_password: ${{ secrets.APP_PASSWORD }}
+            envkey_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
+            envkey_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
+            envkey_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
             # These credentials are used multiple places
-            ACTION_CREATE_ENV_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
-            ACTION_CREATE_ENV_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
+            envkey_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
+            envkey_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
             # Openid connect application db connection
-            ACTION_CREATE_ENV_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
-            ACTION_CREATE_ENV_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
+            envkey_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
+            envkey_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
             # Captcha Configuration
-            ACTION_CREATE_ENV_reCaptcha.verification.secret: ${{ secrets.CAPTCHA_SECRET }}
-            ACTION_CREATE_ENV_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
+            envkey_reCaptcha.verification.secret: ${{ secrets.CAPTCHA_SECRET }}
+            envkey_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
        run: |
           # Filter environment variables with prefix ACTION_CREATE_ENV_
-          filtered_vars=$(env | grep '^ACTION_CREATE_ENV_')  
+          filtered_vars=$(env | grep '^envkey_')  
           # Copy filtered variables to a file
           echo "$filtered_vars" > secrets-temp.properties
           
