@@ -85,8 +85,9 @@ jobs:
      #    envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
      #    envkey_NON_EMPTY: "not empty=1233"
      #    envkey_reCaptcha.verification.secret: "values"
-     # - env:
-     #     API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+     # - id: name
+     #   env:
+     #     oauth2.clientId: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
      #     APP_USERNAME: ${{ secrets.APP_USERNAME }}
      #     APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
      #     OAUTH2_CLIENT_ID: ${{ secrets.OAUTH2_CLIENT_ID }}
@@ -96,6 +97,8 @@ jobs:
      #     OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
      #     CAPTCHA_SECRET: ${{ secrets.CAPTCHA_SECRET }}
      #     CAPTCHA_SITE_KEY: ${{ secrets.CAPTCHA_SITE_KEY }}
+     #     CAPTCHA_SITE_KEY2: ${{ secrets.CAPTCHA_SITE_KEY2 }}
+     #     oauth2.clientId2: ${{ secrets.CAPTCHA_SITE_KEY3 }}
      #   run: |
      #       # echo "file create from DeveloperRic/action-create-env@v1.0.2"
      #       # cat .env
@@ -117,6 +120,7 @@ jobs:
      #            "CAPTCHA_SECRET=reCaptcha.verification.secret"
      #            "CAPTCHA_SITE_KEY=reCaptcha.verification.siteKey"
      #            "API_PORTAL_OAUTH2_CLIENT_SECRET=test.sec"
+     #            CAPTCHA_SITE_KEY2=variable
      #         )
      #         # Loop through the secrets array
      #         for secret in "${secrets[@]}"; do
@@ -154,16 +158,17 @@ jobs:
           
           # Remove prefix ACTION_CREATE_ENV_ from each line in the file
           sed -i 's/envkey_//' secrets-temp.properties 
-          awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties 
+          awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
+          echo $GITHUB_ENV
           
 
      # - uses: actions/upload-artifact@v4
      #   with:
      #    name: my-artifact
      #    path: .env
-     - uses: actions/upload-artifact@v4
-       with:
-        name: my-artifact2
-          # path: secrets.properties, .env
-        path: secrets.properties
+     # - uses: actions/upload-artifact@v4
+     #   with:
+     #    name: my-artifact2
+     #      # path: secrets.properties, .env
+     #    path: secrets.properties
 
