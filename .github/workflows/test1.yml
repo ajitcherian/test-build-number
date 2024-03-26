@@ -117,7 +117,6 @@ jobs:
               
                   # Get the value of the secret from GitHub secrets using indirect expansion
                   secret_value="${!secret_name}"
-                  echo $secret_name $property $secret_value
               
                   # Write the property and its value to secrets.properties
                   echo "${property}=${secret_value}" >> secrets.properties
@@ -127,9 +126,9 @@ jobs:
      #   with:
      #    name: my-artifact
      #    path: .env
-     # - uses: actions/upload-artifact@v4
-     #   with:
-     #    name: my-artifact2
-     #      # path: secrets.properties, .env
-     #    path: secrets.properties
+     - uses: actions/upload-artifact@v4
+       with:
+        name: my-artifact2
+          # path: secrets.properties, .env
+        path: secrets.properties
 
