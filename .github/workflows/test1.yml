@@ -112,9 +112,11 @@ jobs:
                   # Extract the secret name and property
                   secret_name="${secret%%=*}"
                   property="${secret#*=}"
+
               
                   # Get the value of the secret from GitHub secrets using indirect expansion
                   secret_value="${!secret_name}"
+                  echo $secret_name $property $secret_value
               
                   # Write the property and its value to secrets.properties
                   echo "${property}=${secret_value}" >> secrets.properties
