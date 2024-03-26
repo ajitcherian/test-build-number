@@ -105,6 +105,7 @@ jobs:
                 "OAUTH_PASSWORD=OAUTH_PASSWORD"
                 "CAPTCHA_SECRET=reCaptcha.verification.secret"
                 "CAPTCHA_SITE_KEY=reCaptcha.verification.siteKey"
+                "API_PORTAL_OAUTH2_CLIENT_SECRET=test.sec"
              )
              # Loop through the secrets array
              for secret in "${secrets[@]}"; do
