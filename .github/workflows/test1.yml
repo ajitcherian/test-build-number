@@ -159,7 +159,7 @@ jobs:
           # # Remove prefix ACTION_CREATE_ENV_ from each line in the file
           # sed -i 's/envkey_//' secrets-temp.properties 
           # awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-          echo $GITHUB_ENV
+          cat $GITHUB_ENV
           echo "hello"
 
      # - uses: actions/upload-artifact@v4
