@@ -148,8 +148,7 @@ jobs:
             ACTION_CREATE_ENV_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
        run: |
           # Filter environment variables with prefix ACTION_CREATE_ENV_
-          filtered_vars=$(env | grep '^ACTION_CREATE_ENV_')
-          
+          filtered_vars=$(env | grep '^ACTION_CREATE_ENV_')  
           # Copy filtered variables to a file
           echo "$filtered_vars" > secrets-temp.properties
           
