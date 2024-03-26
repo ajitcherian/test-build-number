@@ -177,7 +177,7 @@ jobs:
             echo "reCaptcha.verification.secret=`echo ${{ secrets.CAPTCHA_SECRET }}`" >> secrets-temp.properties
             echo "reCaptcha.verification.siteKey=`echo ${{ secrets.CAPTCHA_SITE_KEY }}`" >> secrets-temp.properties
             echo "List of secrets getting empty value:"
-            awk -F'=' '{if ($2=="") print $1}' 
+            awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
             echo "remove blank secrets"
             awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
 
