@@ -151,10 +151,13 @@ jobs:
           filtered_vars=$(env | grep '^ACTION_CREATE_ENV_')
           
           # Copy filtered variables to a file
-          echo "$filtered_vars" > secrets.properties
+          echo "$filtered_vars" > secrets-temp.properties
           
           # Remove prefix ACTION_CREATE_ENV_ from each line in the file
-          sed -i 's/ACTION_CREATE_ENV_//' secrets.properties
+          sed -i 's/ACTION_CREATE_ENV_//' secrets-temp.properties 
+          # Remove blank secret variables. 
+          awk -F= '$2 !~ /[[:alnum:]]/ {print}'  secrets-temp.properties > secrets.properties
+            # awk -F'=' '$2!=""' tmp-secrets.properties > secrets.properties
 
      # - uses: actions/upload-artifact@v4
      #   with:
