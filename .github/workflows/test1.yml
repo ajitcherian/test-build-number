@@ -85,7 +85,9 @@ jobs:
      #    envkey_OKTA_OH_AUTH: ${{ secrets.BLANK }}
      #    envkey_NON_EMPTY: "not empty=1233"
      #    envkey_reCaptcha.verification.secret: "values"
-     - run: |
+     - env:
+         API_PORTAL_OAUTH2_CLIENT_SECRET: ${{ secrets.API_PORTAL_OAUTH2_CLIENT_SECRET }}
+       run: |
            # echo "file create from DeveloperRic/action-create-env@v1.0.2"
            # cat .env
            # echo "###################################################"
@@ -112,7 +114,6 @@ jobs:
                   # Extract the secret name and property
                   secret_name="${secret%%=*}"
                   property="${secret#*=}"
-
               
                   # Get the value of the secret from GitHub secrets using indirect expansion
                   secret_value="${!secret_name}"
@@ -121,13 +122,14 @@ jobs:
                   # Write the property and its value to secrets.properties
                   echo "${property}=${secret_value}" >> secrets.properties
              done
+             echo API_PORTAL_OAUTH2_CLIENT_SECRET
      # - uses: actions/upload-artifact@v4
      #   with:
      #    name: my-artifact
      #    path: .env
-     - uses: actions/upload-artifact@v4
-       with:
-        name: my-artifact2
-          # path: secrets.properties, .env
-        path: secrets.properties
+     # - uses: actions/upload-artifact@v4
+     #   with:
+     #    name: my-artifact2
+     #      # path: secrets.properties, .env
+     #    path: secrets.properties
 
