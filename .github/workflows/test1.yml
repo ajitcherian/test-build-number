@@ -134,7 +134,8 @@ jobs:
      #              # Write the property and its value to secrets.properties
      #              echo "${property}=${secret_value}" >> secrets.properties
      #         done
-     - env:
+     - id: mysecret
+       env:
             # Add variable name with prefix "ACTION_CREATE_ENV_<VARIABLE-NAME>".
             envkey_username: ${{ secrets.APP_USERNAME }}
             envkey_password: ${{ secrets.APP_PASSWORD }}
@@ -159,8 +160,9 @@ jobs:
           # # Remove prefix ACTION_CREATE_ENV_ from each line in the file
           # sed -i 's/envkey_//' secrets-temp.properties 
           # awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-          cat $GITHUB_ENV
           echo "hello"
+     - name: test
+       run: echo ${{ jobs.mysecret.secrets }}
 
      # - uses: actions/upload-artifact@v4
      #   with:
