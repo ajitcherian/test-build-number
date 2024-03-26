@@ -162,7 +162,7 @@ jobs:
           # awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
           echo "hello"
      - name: test
-       run: echo ${{ jobs.mysecret.secrets }}
+       run: echo ${{ steps.mysecret.env }}
 
      # - uses: actions/upload-artifact@v4
      #   with:
