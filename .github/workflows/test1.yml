@@ -151,16 +151,16 @@ jobs:
             envkey_reCaptcha.verification.secret: ${{ secrets.CAPTCHA_SECRET }}
             envkey_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
        run: |
-          # Filter environment variables with prefix ACTION_CREATE_ENV_
-          filtered_vars=$(env | grep '^envkey_')  
-          # Copy filtered variables to a file
-          echo "$filtered_vars" > secrets-temp.properties
+          # # Filter environment variables with prefix ACTION_CREATE_ENV_
+          # filtered_vars=$(env | grep '^envkey_')  
+          # # Copy filtered variables to a file
+          # echo "$filtered_vars" > secrets-temp.properties
           
-          # Remove prefix ACTION_CREATE_ENV_ from each line in the file
-          sed -i 's/envkey_//' secrets-temp.properties 
-          awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
+          # # Remove prefix ACTION_CREATE_ENV_ from each line in the file
+          # sed -i 's/envkey_//' secrets-temp.properties 
+          # awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
           echo $GITHUB_ENV
-          
+          echo "hello"
 
      # - uses: actions/upload-artifact@v4
      #   with:
