@@ -134,33 +134,38 @@ jobs:
      #              # Write the property and its value to secrets.properties
      #              echo "${property}=${secret_value}" >> secrets.properties
      #         done
-     # - id: mysecret
-     #   env:
-     #        # Add variable name with prefix "ACTION_CREATE_ENV_<VARIABLE-NAME>".
-     #        envkey_username: ${{ secrets.APP_USERNAME }}
-     #        envkey_password: ${{ secrets.APP_PASSWORD }}
-     #        envkey_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
-     #        envkey_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
-     #        envkey_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
-     #        # These credentials are used multiple places
-     #        envkey_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
-     #        envkey_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
-     #        # Openid connect application db connection
-     #        envkey_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
-     #        envkey_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
-     #        # Captcha Configuration
-     #        envkey_reCaptcha.verification.secret: ${{ secrets.CAPTCHA_SECRET }}
-     #        envkey_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
-     #   run: |
-     #      # # Filter environment variables with prefix ACTION_CREATE_ENV_
-     #      # filtered_vars=$(env | grep '^envkey_')  
-     #      # # Copy filtered variables to a file
-     #      # echo "$filtered_vars" > secrets-temp.properties
+     - id: mysecret
+       env:
+            # Add variable name with prefix "ACTION_CREATE_ENV_<VARIABLE-NAME>".
+            envkey_username: ${{ secrets.APP_USERNAME }}
+            envkey_password: ${{ secrets.APP_PASSWORD }}
+            envkey_oauth2.clientId: ${{ secrets.OAUTH2_CLIENT_ID }}
+            envkey_oauth2.clientSecret: ${{ secrets.OAUTH2_CLIENT_SECRET }}
+            envkey_ui.clientId: ${{ secrets.UI_CLIENT_ID }}
+            # These credentials are used multiple places
+            envkey_oauth2.username: ${{ secrets.OAUTH2_USERNAME }}
+            envkey_oauth2.password: ${{ secrets.OAUTH2_PASSWORD }}
+            # Openid connect application db connection
+            envkey_OAUTH_USER_NAME: ${{ secrets.OAUTH_USER_NAME }}
+            envkey_OAUTH_PASSWORD: ${{ secrets.OAUTH_PASSWORD }}
+            # Captcha Configuration
+            envkey_reCaptcha.verification.secret: ${{ secrets.CAPTCHA_SECRET }}
+            envkey_reCaptcha.verification.siteKey: ${{ secrets.CAPTCHA_SITE_KEY }}
+       run: |
+          echo "print all env"
+          env
+          echo "#######################################################################"
+          echo "print env having envkey_ string"
+          env | grep '^envkey_'
+          echo "#######################################################################"
+          # Filter environment variables with prefix ACTION_CREATE_ENV_
+          filtered_vars=$(env | grep '^envkey_')  
+          # Copy filtered variables to a file
+          echo "$filtered_vars" > secrets-temp.properties
           
-     #      # # Remove prefix ACTION_CREATE_ENV_ from each line in the file
-     #      # sed -i 's/envkey_//' secrets-temp.properties 
-     #      # awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-     #      echo "hello"
+          # Remove prefix ACTION_CREATE_ENV_ from each line in the file
+          sed -i 's/envkey_//' secrets-temp.properties 
+          awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
      # - name: test
      #   run: echo ${{ steps.mysecret.id }}
      # - name: Make Secret File
@@ -180,20 +185,20 @@ jobs:
      #        awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
      #        echo "remove blank secrets"
      #        awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-     - name: Write value to Properties-file
-       uses: christian-draeger/write-properties@1.1.0
-       with:
-         path: './secrets.properties'
-         property: |
-           'username'
-           'password'
-           'OAUTH_PASSWORD'
-           'reCaptcha.verification.secret'
-         value: |
-           '${{ secrets.APP_USERNAME }}'
-           '${{ secrets.APP_PASSWORD }}'
-           '${{ secrets.OAUTH_PASSWORD }}'
-           '${{ secrets.CAPTCHA_SECRET }}'
+     # - name: Write value to Properties-file
+     #   uses: christian-draeger/write-properties@1.1.0
+     #   with:
+     #     path: './secrets.properties'
+     #     property: |
+     #       'username'
+     #       'password'
+     #       'OAUTH_PASSWORD'
+     #       'reCaptcha.verification.secret'
+     #     value: |
+     #       '${{ secrets.APP_USERNAME }}'
+     #       '${{ secrets.APP_PASSWORD }}'
+     #       '${{ secrets.OAUTH_PASSWORD }}'
+     #       '${{ secrets.CAPTCHA_SECRET }}'
      # - uses: actions/upload-artifact@v4
      #   with:
      #    name: my-artifact
