@@ -163,24 +163,37 @@ jobs:
      #      echo "hello"
      # - name: test
      #   run: echo ${{ steps.mysecret.id }}
-     - name: Make Secret File
-       run: |
-            echo "username=`echo ${{ secrets.APP_USERNAME }}`" >> secrets-temp.properties
-            echo "password=`echo ${{ secrets.APP_PASSWORD }}`" >> secrets-temp.properties
-            echo "oauth2.clientId=`echo ${{ secrets.OAUTH2_CLIENT_ID }}`" >> secrets-temp.properties
-            echo "oauth2.clientSecret=`echo ${{ secrets.OAUTH2_CLIENT_SECRET }}`" >> secrets-temp.properties 
-            echo "ui.clientId=`echo ${{ secrets.UI_CLIENT_ID }}`" >> secrets-temp.properties
-            echo "oauth2.username=`echo ${{ secrets.OAUTH2_USERNAME }}`" >> secrets-temp.properties
-            echo "oauth2.password=`echo ${{ secrets.OAUTH2_PASSWORD }}`" >> secrets-temp.properties
-            echo "OAUTH_USER_NAME=`echo ${{ secrets.OAUTH_USER_NAME }}`" >> secrets-temp.properties
-            echo "OAUTH_PASSWORD=`echo ${{ secrets.OAUTH_PASSWORD }}`" >> secrets-temp.properties 
-            echo "reCaptcha.verification.secret=`echo ${{ secrets.CAPTCHA_SECRET }}`" >> secrets-temp.properties
-            echo "reCaptcha.verification.siteKey=`echo ${{ secrets.CAPTCHA_SITE_KEY }}`" >> secrets-temp.properties
-            echo "List of secrets getting empty value:"
-            awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
-            echo "remove blank secrets"
-            awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-
+     # - name: Make Secret File
+     #   run: |
+     #        echo "username=`echo ${{ secrets.APP_USERNAME }}`" >> secrets-temp.properties
+     #        echo "password=`echo ${{ secrets.APP_PASSWORD }}`" >> secrets-temp.properties
+     #        echo "oauth2.clientId=`echo ${{ secrets.OAUTH2_CLIENT_ID }}`" >> secrets-temp.properties
+     #        echo "oauth2.clientSecret=`echo ${{ secrets.OAUTH2_CLIENT_SECRET }}`" >> secrets-temp.properties 
+     #        echo "ui.clientId=`echo ${{ secrets.UI_CLIENT_ID }}`" >> secrets-temp.properties
+     #        echo "oauth2.username=`echo ${{ secrets.OAUTH2_USERNAME }}`" >> secrets-temp.properties
+     #        echo "oauth2.password=`echo ${{ secrets.OAUTH2_PASSWORD }}`" >> secrets-temp.properties
+     #        echo "OAUTH_USER_NAME=`echo ${{ secrets.OAUTH_USER_NAME }}`" >> secrets-temp.properties
+     #        echo "OAUTH_PASSWORD=`echo ${{ secrets.OAUTH_PASSWORD }}`" >> secrets-temp.properties 
+     #        echo "reCaptcha.verification.secret=`echo ${{ secrets.CAPTCHA_SECRET }}`" >> secrets-temp.properties
+     #        echo "reCaptcha.verification.siteKey=`echo ${{ secrets.CAPTCHA_SITE_KEY }}`" >> secrets-temp.properties
+     #        echo "List of secrets getting empty value:"
+     #        awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
+     #        echo "remove blank secrets"
+     #        awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
+     - name: Write value to Properties-file
+       uses: christian-draeger/write-properties@1.1.0
+       with:
+         path: './secrets.properties'
+         property: |
+           'username'
+           'password'
+           'OAUTH_PASSWORD'
+           'reCaptcha.verification.secret'
+         value: |
+           '${{ secrets.APP_USERNAME }}'
+           '${{ secrets.APP_PASSWORD }}'
+           '${{ secrets.OAUTH_PASSWORD }}'
+           '${{ secrets.CAPTCHA_SECRET }}'
      # - uses: actions/upload-artifact@v4
      #   with:
      #    name: my-artifact
