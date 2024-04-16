@@ -84,7 +84,7 @@ jobs:
       name: Set Docker image name and tags
       run: |
         #set project variables
-        PROJECT_NAME="iknowmed-mcp-admin"
+        PROJECT_NAME="iknowmed-mcp-admin-service"
         echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
         # Get input release value
         input="${{ env.RELEASE_VERSION}}"
