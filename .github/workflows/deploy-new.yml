@@ -113,12 +113,42 @@ jobs:
       id: kubectl
       with:
         kubectl-version: v1.24.5
-    
+    - name: "Make secret file"
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        # Add variable name with prefix "envkey_<VARIABLE-NAME>".
+        envkey_LIQUIBASE_MONGO_URL_DATABASENAME: ${{ secrets.LIQUIBASE_MONGO_URL_DATABASENAME }}
+        envkey_SPRING_DATA_MONGODB_URI: ${{ secrets.SPRING_DATA_MONGODB_URI }}
+        envkey_NOT_BLANK: "not blank"
+        # Below are variable for the module
+        file_name: .kube/kustomize/base/common/tmp-secrets.properties
+        fail_on_empty: false
+        sort_keys: false    
     -
       name: "Deploy to ${{ github.event.inputs.deploy-environment }} cluster"
       run: |
         
+        # secret having empty values
+        echo "List of secrets getting empty value:"
+        awk -F'=' '{if ($2=="") print $1}'  .kube/kustomize/base/common/tmp-secrets.properties
+        cat .kube/kustomize/base/common/tmp-secrets.properties
+        #Removing empty secrets from secret file"
+        awk -F'=' '$2!=""'  .kube/kustomize/base/common/tmp-secrets.properties >  .kube/kustomize/base/common/secrets.properties
+        cat .kube/kustomize/base/common/secrets.properties
+
         cd .kube/kustomize
+
+        # Copy config properties variables, Export all variables, Update env variables in kustomize
+        echo ${{ env.CONFIG_FILE }} > base/common/config.properties
+        . base/common/config.properties && export $(sed -E '/^\s*#/d; /^\s*$/d' base/common/config.properties | cut -d '=' -f 1)        
+        # Perform substitutions on deployment yml file
+        envsubst < base/common/deployment.yml > base/common/deployment-temp.yml && mv base/common/deployment-temp.yml base/common/deployment.yml
+        #For testing will remove after reviwing
+        kubectl kustomize overlays/${{ env.ENV }}/
+        #Apply changes using kustomize
+        #kubectl apply -k overlays/${{ env.ENV }}/ --token="$KUBERNETES_SERVICE_ACCOUNT" --certificate-authority=$CLUSTER_CERT --server=$CLUSTER_API
+
+
 
         # Copy config properties variables, Export all variables, Update env variables in kustomize
         #echo ${{ env.CONFIG_FILE }} > overlays/${{ env.ENV }}/config.properties
