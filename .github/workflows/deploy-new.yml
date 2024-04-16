@@ -109,9 +109,10 @@ jobs:
     -
       name: Get Manifest File
       uses: actions/checkout@v2
-    - uses: tale/kubectl-action@v1
+    - uses: marcofranssen/setup-kubectl@v0.3.0
+      id: kubectl
       with:
-        base64-kube-config: ${{ env.SECRET }}
+        kubectl-version: v1.24.5
     
     -
       name: "Deploy to ${{ github.event.inputs.deploy-environment }} cluster"
