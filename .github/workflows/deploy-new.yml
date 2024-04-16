@@ -1,0 +1,128 @@
+name: Deploy Workflow
+on:
+  workflow_dispatch:
+   inputs:
+     deploy-environment:
+       type: choice
+       description: 'Environment to deploy to'
+       options:
+       - dev
+       - prod
+       - qa
+       - uat
+       - prod-dr
+       - stage
+       - sre-dev
+       required: true
+       default: 'sre-dev'
+     release-version:
+       description: 'Get Release version from Github release'
+       required: true    
+        
+env:
+  DOCKER_REGISTRY: "my-jfrog"
+  LIQUIBASE_JFROG_REPO_NAME: "iknowmed-mcp-admin-service-liquibase"
+  APP_JFROG_REPO_NAME: "iknowmed-mcp-admin-service"
+  RELEASE_VERSION: "${{ github.event.inputs.release-version }}"
+  ENV: "${{ github.event.inputs.deploy-environment }}"
+  WORKFLOW_ID: "${{ github.run_id }}"
+  
+
+jobs:
+  approval:
+    name: "Approval Stage for Prod environment"
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Get Code
+        uses: actions/checkout@v2
+        if: contains(github.event.inputs.deploy-environment, 'prod')
+      - name: "Check and Cancel Job"
+        if: contains(github.event.inputs.deploy-environment, 'prod')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          total_sleep_time=600 # Total sleep time in seconds
+          check_interval=15    # Check interval in seconds
+
+          # Calculate the number of iterations needed
+          iterations=$((total_sleep_time / check_interval))
+
+          # Loop for the specified number of iterations
+          for ((i = 0; i < iterations; i++)); do
+            status=$(gh run view ${{ github.run_id }} --json status | jq -r .status)
+
+            if [ "$status" != "waiting" ]; then
+              total_sleep_time=300 # New total sleep time in seconds
+              # Exit the loop and script
+              exit 0
+            fi
+            sleep $check_interval
+          done        
+          gh run cancel ${{ github.run_id }}
+
+  deploy:
+    name: "${{ github.event.inputs.deploy-environment }} deploy for release ${{ github.event.inputs.release-version }}"
+    environment: ${{ github.event.inputs.deploy-environment }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Validate Deployment
+      run: |
+        if  [ "$RELEASE_VERSION" = "latest" ]; then
+          echo "Deployment without version tag is not allowed, please add the version"
+          exit 1
+        else
+          echo "Valid deployment"
+        fi
+    -
+      name: Get Manifest File
+      uses: actions/checkout@v2
+    - 
+      name: Set Docker image name and tags
+      run: |
+        #set project variables
+        PROJECT_NAME="iknowmed-mcp-admin"
+        echo "PROJECT_NAME=`echo ${PROJECT_NAME}`" >> $GITHUB_ENV
+        # Get input release value
+        input="${{ env.RELEASE_VERSION}}"
+        if [[ $input =~ ^$PROJECT_NAME-(.*?)-([0-9]{4})-([0-9]{2})-([0-9]{2})-([0-9]{6})-([0-9]+) ]]; then
+          BRANCH_NAME=$(echo "${BASH_REMATCH[1]}" | sed 's/\//-/g')
+          echo "BRANCH_NAME=`echo ${BRANCH_NAME}`" >> $GITHUB_ENV
+          #Get docker image tag name from release name
+          LIQUIBASE_DOCKER_IMAGE=$(echo ${{ env.DOCKER_REGISTRY}}/${{ env.LIQUIBASE_JFROG_REPO_NAME }}/${BRANCH_NAME})
+          APP_DOCKER_IMAGE=$(echo ${{ env.DOCKER_REGISTRY}}/${{ env.APP_JFROG_REPO_NAME }}/${BRANCH_NAME})
+          echo "LIQUIBASE_DOCKER_IMAGE=`echo ${LIQUIBASE_DOCKER_IMAGE}`" >> $GITHUB_ENV
+          echo "APP_DOCKER_IMAGE=`echo ${APP_DOCKER_IMAGE}`" >> $GITHUB_ENV  
+          DOCKER_IMAGE_TAG=$PROJECT_NAME-$BRANCH_NAME-${BASH_REMATCH[2]}-${BASH_REMATCH[3]}-${BASH_REMATCH[4]}-${BASH_REMATCH[5]}-${BASH_REMATCH[6]}
+          echo "DOCKER_IMAGE_TAG=`echo ${DOCKER_IMAGE_TAG}`" >> $GITHUB_ENV     
+          echo "APP_VERSION=`echo ${RELEASE_VERSION}`" >> $GITHUB_ENV
+        else
+          echo "Invalid input format: $input"
+          exit 1
+        fi
+        NAMESPACE=`grep "namespace:" .kube/kustomize/overlays/${{ env.ENV }}/kustomization.yml | awk '{print $2}'`
+        echo "NAMESPACE=`echo ${NAMESPACE}`" >> $GITHUB_ENV
+
+    -
+      name: Get Manifest File
+      uses: actions/checkout@v2
+    - uses: tale/kubectl-action@v1
+      with:
+        base64-kube-config: ${{ env.SECRET }}
+    
+    -
+      name: "Deploy to ${{ github.event.inputs.deploy-environment }} cluster"
+      run: |
+        
+        cd .kube/kustomize
+
+        # Copy config properties variables, Export all variables, Update env variables in kustomize
+        echo ${{ env.CONFIG_FILE }} > overlays/${{ env.ENV }}/config.properties
+        . overlays/${{ env.ENV }}/config.properties && export $(sed -E '/^\s*#/d; /^\s*$/d' overlays/${{ env.ENV }}/config.properties | cut -d '=' -f 1)        
+        # Perform substitutions on deployment yml file
+        envsubst < base/common/deployment.yml > base/common/deployment-temp.yml && mv base/common/deployment-temp.yml base/common/deployment.yml
+        #For testing will remove after reviwing
+        kubectl kustomize overlays/${{ env.ENV }}/
