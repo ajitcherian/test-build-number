@@ -121,8 +121,9 @@ jobs:
         cd .kube/kustomize
 
         # Copy config properties variables, Export all variables, Update env variables in kustomize
-        echo ${{ env.CONFIG_FILE }} > overlays/${{ env.ENV }}/config.properties
-        . overlays/${{ env.ENV }}/config.properties && export $(sed -E '/^\s*#/d; /^\s*$/d' overlays/${{ env.ENV }}/config.properties | cut -d '=' -f 1)        
+        #echo ${{ env.CONFIG_FILE }} > overlays/${{ env.ENV }}/config.properties
+        echo ${{ env.CONFIG_FILE }} > base/common/config.properties
+        . base/common/config.properties && export $(sed -E '/^\s*#/d; /^\s*$/d' base/common/config.properties | cut -d '=' -f 1)        
         # Perform substitutions on deployment yml file
         envsubst < base/common/deployment.yml > base/common/deployment-temp.yml && mv base/common/deployment-temp.yml base/common/deployment.yml
         #For testing will remove after reviwing
