@@ -2,21 +2,14 @@ name: Checkbox Options
 on:
   workflow_dispatch:
     inputs:
-      option1:
-        description: 'Option 1'
-        required: false
-        default: false
-        type: checkbox
-      option2:
-        description: 'Option 2'
-        required: false
-        default: false
-        type: checkbox
-      option3:
-        description: 'Option 3'
-        required: false
-        default: false
-        type: checkbox
+      print_tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+        options:
+        - hello
+        - by
+        - seeu
 jobs:
   build:
     runs-on: ubuntu-latest
