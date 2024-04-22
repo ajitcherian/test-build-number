@@ -1,31 +1,36 @@
-name: Multi-Choice Options
-
+name: Checkbox Options
 on:
   workflow_dispatch:
     inputs:
-      choice:
-        description: 'Select an option'
-        required: true
-        default: 'option1'
-        choices:
-          - option1
-          - option2
-          - option3
+      option1:
+        description: 'Option 1'
+        required: false
+        default: false
+        type: checkbox
+      option2:
+        description: 'Option 2'
+        required: false
+        default: false
+        type: checkbox
+      option3:
+        description: 'Option 3'
+        required: false
+        default: false
+        type: checkbox
 jobs:
   build:
     runs-on: ubuntu-latest
-
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Run the selected option
+      - name: Run the selected options
         run: |
-          if [[ "${{ inputs.choice }}" == 'option1' ]]; then
-            echo "Option 1 chosen"
-          elif [[ "${{ inputs.choice }}" == 'option2' ]]; then
-            echo "Option 2 chosen"
-          elif [[ "${{ inputs.choice }}" == 'option3' ]]; then
-            echo "Option 3 chosen"
+          if [[ "${{ inputs.option1 }}" == 'true' ]]; then
+            echo "Option 1 checked"
+          fi
+          if [[ "${{ inputs.option2 }}" == 'true' ]]; then
+            echo "Option 2 checked"
+          fi
+          if [[ "${{ inputs.option3 }}" == 'true' ]]; then
+            echo "Option 3 checked"
           fi
