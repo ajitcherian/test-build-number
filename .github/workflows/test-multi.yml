@@ -1,26 +1,31 @@
-name: Mixed inputs
+name: Multi-Choice Options
 
 on:
   workflow_dispatch:
     inputs:
-      name:
-        type: choice
-        description: Who to greet
-        options: 
-        - monalisa
-        - cschleiden
-      message:
+      choice:
+        description: 'Select an option'
         required: true
-      use-emoji:
-        type: boolean
-        description: Include 🎉🤣 emojis
-      environment:
-        type: environment
-
+        default: 'option1'
+        choices:
+          - option1
+          - option2
+          - option3
 jobs:
-  greet:
+  build:
     runs-on: ubuntu-latest
 
+
     steps:
-    - name: Send greeting
-      run: echo "${{ github.event.inputs.message }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run the selected option
+        run: |
+          if [[ "${{ inputs.choice }}" == 'option1' ]]; then
+            echo "Option 1 chosen"
+          elif [[ "${{ inputs.choice }}" == 'option2' ]]; then
+            echo "Option 2 chosen"
+          elif [[ "${{ inputs.choice }}" == 'option3' ]]; then
+            echo "Option 3 chosen"
+          fi
