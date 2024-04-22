@@ -5,7 +5,7 @@ on:
       print_tags:
         description: 'True to print to STDOUT'
         required: true
-        type: choices
+        type: options
         options:
         - hello
         - by
