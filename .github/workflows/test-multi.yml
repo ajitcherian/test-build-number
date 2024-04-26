@@ -34,9 +34,10 @@ jobs:
         elif [ ${{ env.ALL_SERVICES }} == true ]; then
           set -ex
           echo "${{ vars.ALL_CRONJOB_NAMES }}" > all-cronjobs.txt
+          sed -i 's/\r//g'  all-cronjobs.txt
           cat all-cronjobs.txt
           IFS=''
           while read line; do
-              echo $line | sed -i 's/\r//g'
+              echo $line
           done < all-cronjobs.txt
         fi
