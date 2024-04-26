@@ -1,29 +1,42 @@
-name: Checkbox Options
+name: Deploy Workflow
 on:
   workflow_dispatch:
     inputs:
-      print_tags:
-        description: 'True to print to STDOUT'
+      choose-service:
+        description: 'Please choose batch job'
         required: true
-        type: string
+        type: choice
         options:
-        - hello
-        - by
-        - seeu
+        - none
+        - invitation-expiry-populate
+        - invitation-expiry-process
+        default: 'none' 
+
+      all-services:
+        description: 'select all services at once'
+        type: boolean
+        required: true
+        default: false
+
+env:
+  SERVICE_NAME: "${{ github.event.inputs.choose-service }}"
+  ALL_SERVICES: "${{ github.event.inputs.all-services }}"
+  ENV: "dev"
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Run the selected options
-        run: |
-          if [[ "${{ inputs.option1 }}" == 'true' ]]; then
-            echo "Option 1 checked"
-          fi
-          if [[ "${{ inputs.option2 }}" == 'true' ]]; then
-            echo "Option 2 checked"
-          fi
-          if [[ "${{ inputs.option3 }}" == 'true' ]]; then
-            echo "Option 3 checked"
-          fi
+    - name: Test
+      run: |
+        if [ ${{ env.ALL_SERVICES }} == false ]; then
+          echo $SERVICE_NAME
+
+        elif [ ${{ env.ALL_SERVICES }} == true ]; then
+          set -ex
+          echo "${{ vars.ALL_CRONJOB_NAMES }}" > all-cronjobs.txt
+          cat all-cronjobs.txt
+          IFS=''
+          while read line; do
+              echo $line
+          done < all-cronjobs.txt
+        fi
