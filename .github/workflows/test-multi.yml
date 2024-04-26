@@ -37,6 +37,6 @@ jobs:
           cat all-cronjobs.txt
           IFS=''
           while read line; do
-              echo $line
+              echo $line | sed -i 's/\r//g'
           done < all-cronjobs.txt
         fi
