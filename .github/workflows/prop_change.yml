@@ -43,13 +43,6 @@ jobs:
             sed '/^\s*$/d; /^#/d' Application.Properties | sort  > filtered_man.prop
             sed '/^\s*$/d; /^#/d' ${{ vars.CONFIG_FILE_NAME }} | sort > filtered_file_auto.prop
             diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
-            if [ $? -eq 0 ]; then
-                echo "No changes detected in the property file. Proceeding with deployment."
-            else
-                echo "Warning: Manual changes detected in the property file. Skipping deployment."
-                echo "Showing difference and stop the workflow."
-                cat property_diff.patch
-                echo "############Make change in github then run the workflow##############"
-            fi
+            if [ $? -eq 0 ]; then echo "No changes detected in the property file. Proceeding with deployment."; else echo "Warning: Manual changes detected in the property file. Skipping deployment."; echo "Showing difference and stop the workflow."; cat property_diff.patch; echo "############Make change in github then run the workflow##############"; fi
 
 
