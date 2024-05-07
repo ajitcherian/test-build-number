@@ -45,4 +45,4 @@ jobs:
             sed '/^\s*$/d; /^#/d' Application.Properties | sort  > filtered_man.prop
             sed '/^\s*$/d; /^#/d' ${{ vars.CONFIG_FILE_NAME }} | sort > filtered_file_auto.prop
             diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
-            echo "$?"
+            cat property_diff.patch
