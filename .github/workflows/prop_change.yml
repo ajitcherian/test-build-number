@@ -35,7 +35,6 @@ jobs:
             mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
             echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
             cat secrets.properties >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
-            echo "apiportal.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
             cat ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
             cp ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }} .
 
