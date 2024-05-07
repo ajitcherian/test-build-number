@@ -1,0 +1,61 @@
+name: "APIPORTAL and FHIR SMART SAMPLE WEBAPP CD Workflow"
+
+on:
+  workflow_dispatch:
+
+env:
+  WORKFLOW_FOLDER_NAME: "tmp/apiportal/target"
+
+jobs:
+
+  deployment:
+      name: "Test"
+      environment: DEV
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          shell: bash
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v2
+
+        - name: Make Secret File
+          run: |
+            echo "SECRET1=`echo ${{ secrets.SECRET1 }}`" >> secrets-temp.properties
+            echo "SECRET2=`echo ${{ secrets.SECRET2 }}`" >> secrets-temp.properties
+            echo "SECRET3=`echo ${{ secrets.SECRET3 }}`" >> secrets-temp.properties
+            echo "List of secrets getting empty value:"
+            awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
+            echo "Removing blank secrets"
+            awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
+            
+        - name: Set Application Properties File
+          run: |
+            # Remove blank secret variables.
+            mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
+            echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+            cat secrets.properties >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+            echo "apiportal.build.number=`echo ${{ env.TAG_NUMBER }} |  awk -F'[-.]' '{print $NF}'`" >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+            cat ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
+            cp ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }} .
+
+            # Filter out blank lines and lines starting with #
+            # Sort files
+            sed '/^\s*$/d; /^#/d' Application.Properties | sort  > filtered_man.prop
+            sed '/^\s*$/d; /^#/d' ${{ vars.CONFIG_FILE_NAME }} | sort > filtered_file_auto.prop
+            
+            #Check for differnce and store in a file
+            diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
+            
+            # Check if there are differences
+            if [ $? -eq 0 ]; then
+                echo "No changes detected in the property file. Proceeding with deployment."
+            else
+                echo "Warning: Manual changes detected in the property file. Skipping deployment."
+                echo "Showing difference and stop the workflow."
+                cat property_diff.patch
+                echo "############Make change in github then run the workflow##############"
+                # also give option to forecully mae update
+            fi
+
+
