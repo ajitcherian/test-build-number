@@ -23,26 +23,14 @@ jobs:
 
         - name: Make Secret File
           run: |
-            echo "SECRET1=`echo ${{ secrets.SECRET1 }}`" >> secrets-temp.properties
+            echo "SECRET_ONE=`echo ${{ secrets.SECRET_ONE }}`" >> secrets-temp.properties
             echo "SECRET2=`echo ${{ secrets.SECRET2 }}`" >> secrets-temp.properties
             echo "SECRET3=`echo ${{ secrets.SECRET3 }}`" >> secrets-temp.properties
             echo "List of secrets getting empty value:"
             awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
             echo "Removing blank secrets"
             awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
-            
-        - name: Set Application Properties File
-          run: |
-            # Remove blank secret variables.
-            mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
-            echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
-            cat secrets.properties >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
-            cp ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }} .
-            cat ${{ vars.CONFIG_FILE_NAME }}
-
-            # Filter out blank lines and lines starting with #
-            # Sort files
-            sed '/^\s*$/d; /^#/d' Application.Properties | sort  > filtered_man.prop
-            sed '/^\s*$/d; /^#/d' ${{ vars.CONFIG_FILE_NAME }} | sort > filtered_file_auto.prop
-            diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
-            cat property_diff.patch
+        - uses: actions/upload-artifact@v4
+          with:
+            name: my-artifact
+            path: ./secrets.properties
