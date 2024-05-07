@@ -12,7 +12,7 @@ jobs:
 
   deployment:
       name: "Test"
-      environment: DEV
+      environment: prod
       runs-on: ubuntu-latest
       defaults:
         run:
@@ -24,8 +24,6 @@ jobs:
         - name: Make Secret File
           run: |
             echo "SECRET_ONE=`echo ${{ secrets.SECRET_ONE }}`" >> secrets-temp.properties
-            echo "SECRET2=`echo ${{ secrets.SECRET2 }}`" >> secrets-temp.properties
-            echo "SECRET3=`echo ${{ secrets.SECRET3 }}`" >> secrets-temp.properties
             echo "List of secrets getting empty value:"
             awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
             echo "Removing blank secrets"
