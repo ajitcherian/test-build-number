@@ -35,8 +35,8 @@ jobs:
             mkdir -p ${{ env.WORKFLOW_FOLDER_NAME }}
             echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
             cat secrets.properties >> ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
-            cat ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }}
-            # cp ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }} .
+            cp ./${{ env.WORKFLOW_FOLDER_NAME }}/${{ vars.CONFIG_FILE_NAME }} .
+            cat ${{ vars.CONFIG_FILE_NAME }}
 
             # # Filter out blank lines and lines starting with #
             # # Sort files
