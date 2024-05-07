@@ -42,8 +42,8 @@ jobs:
             # Sort files
             sed '/^\s*$/d; /^#/d' Application.Properties | sort  > filtered_man.prop
             sed '/^\s*$/d; /^#/d' ${{ vars.CONFIG_FILE_NAME }} | sort > filtered_file_auto.prop
-            which diff
-            diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
+            #diff -u filtered_file_auto.prop filtered_man.prop  > property_diff.patch
+            diff filtered_file_auto.prop filtered_man.prop  
             
             # # Check if there are differences
             # if [ $? -eq 0 ]; then
