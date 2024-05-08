@@ -35,6 +35,7 @@ on:
         default: "only copy propertyfile"
         type: choice
         options:
+          - only copy propertyfile
           - apiportal-release-3.40.0-2024-04-05-080835-03
           - apiportal-release-3.40.0-2023-09-06-080835-02
           - apiportal-ci-cd-test-2024-03-28-100139-61
