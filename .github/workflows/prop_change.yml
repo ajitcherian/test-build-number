@@ -1,18 +1,25 @@
-name: "Test Prop"
+name: "Test prop diff"
 
 on:
-  push:
-    branches:
-    - kustomize
+  workflow_dispatch:
+    inputs:
+      deploy-environment:
+        type: environment
+        description: 'Choose environment'
+        required: true
+        default: 'DEV'
+
+      force-copy-property-file: 
+        type: boolean
+        required: true
+        default: false
 
 env:
-  WORKFLOW_FOLDER_NAME: "tmp/apiportal/target"
-
+  COPY_PROP_FORCE: "${{ github.event.inputs.force-copy-property-file }}"
 jobs:
-
   deployment:
-      name: "Test"
-      environment: prod
+      name: "Property file diff check"
+      environment: ${{ github.event.inputs.deploy-environment }}
       runs-on: ubuntu-latest
       defaults:
         run:
@@ -20,15 +27,35 @@ jobs:
       steps:
         - name: Checkout Repository
           uses: actions/checkout@v2
-
         - name: Make Secret File
           run: |
-            echo "SECRET_ONE=`echo ${{ secrets.SECRET_ONE }}`" >> secrets-temp.properties
+            echo "SECRET2=`echo ${{ secrets.SECRET2 }}`" >> secrets-temp.properties
+            echo "SECRET1=`echo ${{ secrets.SECRET1 }}`" >> secrets-temp.properties
             echo "List of secrets getting empty value:"
             awk -F'=' '{if ($2=="") print $1}' secrets-temp.properties
             echo "Removing blank secrets"
             awk -F'=' '$2!=""' secrets-temp.properties  > secrets.properties
+        - name: Set Application Properties File
+          run: |
+            # Remove blank secret variables.
+            echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ vars.CONFIG_FILE_NAME }}
+            cat secrets.properties >> ./${{ vars.CONFIG_FILE_NAME }}
+            #pacman -S --noconfirm diffutils
+            diff -u ${{ vars.CONFIG_FILE_NAME }} Application.Properties > property_diff.patch || true
+            if [[ -s property_diff.patch ]]; then
+                echo "Warning: Manual changes detected in the property file. Skipping deployment."
+                echo "Showing difference and stop the workflow."
+                cat property_diff.patch
+                echo "############Above are changes after compare##############"
+                if [[ "${{ env.COPY_PROP_FORCE }}" == "true" ]]; then
+                  echo "execute with force deployment"
+                else
+                  exit 1
+                fi
+            else
+                echo "No changes detected in the property file. Proceeding with deployment."
+            fi
         - uses: actions/upload-artifact@v4
           with:
             name: my-artifact
-            path: ./secrets.properties
+            path: ./${{ vars.CONFIG_FILE_NAME }}
