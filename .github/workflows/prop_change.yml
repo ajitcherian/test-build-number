@@ -41,6 +41,11 @@ jobs:
             echo ${{ vars.APPLICATION_PROPERTIES }} >> ./${{ vars.CONFIG_FILE_NAME }}
             cat secrets.properties >> ./${{ vars.CONFIG_FILE_NAME }}
             #pacman -S --noconfirm diffutils
+            echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+            cat ${{ vars.CONFIG_FILE_NAME }}
+            echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+            cat Application.Properties
+            echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
             diff -u ${{ vars.CONFIG_FILE_NAME }} Application.Properties > property_diff.patch || true
             if [[ -s property_diff.patch ]]; then
                 echo "Warning: Manual changes detected in the property file. Skipping deployment."
