@@ -1,4 +1,4 @@
-name: "APIPORTAL and FHIR SMART SAMPLE WEBAPP CD Workflow"
+name: "POC|APIPORTAL and FHIR SMART SAMPLE WEBAPP CD Workflow"
 
 on:
   workflow_dispatch:
@@ -103,16 +103,10 @@ jobs:
   deployment:
       name: "${{ github.event.inputs.choose-service }} Deployment in ${{ github.event.inputs.deploy-environment }} for tag : ${{ github.event.inputs.release-version }}"
       environment: ${{ github.event.inputs.deploy-environment }}
-      runs-on: kube-deploy
+      runs-on: ubuntu-latest
       defaults:
         run:
           shell: bash
-      container:
-        image: mck-ontada-sre.jfrog.io/sqlplus/sqlplus:archlinux_base
-        options: --user root
-        credentials:
-            username: ${{ secrets.DEV_PORTAL_JFROG_USERNAME }}
-            password: ${{ secrets.DEV_PORTAL_JFROG_API_KEY }}
       steps:
         - name: Set Variables
           run: |
