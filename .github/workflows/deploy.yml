@@ -33,7 +33,7 @@ on:
         description: 'TAG_NUMBER'
         required: true
         default: "only copy propertyfile"
-        type: string
+        type: choice
         options:
           - apiportal-release-3.40.0-2024-04-05-080835-03
           - apiportal-release-3.40.0-2023-09-06-080835-02
