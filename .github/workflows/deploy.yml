@@ -23,7 +23,7 @@ jobs:
             file_name="file.txt"
             while IFS= read -r line; do
              echo "this is $line"
-             cat file.json | jq '.${line}'
+             cat file.json | jq .${line}
             done < "$file_name"
           shell: bash
         - uses: actions/upload-artifact@v4
