@@ -26,5 +26,10 @@ jobs:
           env:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
-            echo $ALLSECRETS | jq 
+            echo ${{ vars.SECRET_LIST }} >> file.txt
+            file_name="file.txt"
+            while IFS= read -r line; do
+             echo "this is $line"
+             echo $ALLSECRETS | jq .$line
+            done < "$file_name"
           shell: bash
