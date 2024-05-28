@@ -23,10 +23,11 @@ jobs:
             file_name="file.txt"
             while IFS= read -r line; do
              echo "this is $line"
-             jq .SECRET1 file.json
+             variable_name=`echo $line`
+             jq .$variable_name file.json
             done < "$file_name"
           shell: bash
-        - uses: actions/upload-artifact@v4
-          with:
-           name: my-artifact
-           path: file.json
+        # - uses: actions/upload-artifact@v4
+        #   with:
+        #    name: my-artifact
+        #    path: file.json
