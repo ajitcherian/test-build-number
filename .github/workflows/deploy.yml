@@ -16,4 +16,5 @@ jobs:
       steps:
         - name: check
           run: |
-            echo ${{ vars.SECRET_LIST }}
+            echo ${{ vars.SECRET_LIST }} >> file.txt
+            cat file.txt
