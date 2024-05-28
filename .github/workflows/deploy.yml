@@ -14,22 +14,19 @@ jobs:
         run:
           shell: bash
       steps:
-        - name: check
-          run: |
-            echo ${{ vars.SECRET_LIST }} >> file.txt
-            cat file.txt
-            file_name="file.txt"
-            while IFS= read -r line; do
-             echo "this is $line"
-            done < "$file_name"
         - name: Extract secrets to HEX
           env:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
-            echo ${{ vars.SECRET_LIST }} >> file.txt
-            file_name="file.txt"
-            while IFS= read -r line; do
-             echo "this is $line"
-             echo $ALLSECRETS | jq .$line
-            done < "$file_name"
+            echo $ALLSECRETS > file.json
+            # echo ${{ vars.SECRET_LIST }} >> file.txt
+            # file_name="file.txt"
+            # while IFS= read -r line; do
+            #  echo "this is $line"
+            #  echo $ALLSECRETS | jq .$line
+            # done < "$file_name"
           shell: bash
+        - uses: actions/upload-artifact@v4
+          with:
+           name: my-artifact
+           path: file.json
