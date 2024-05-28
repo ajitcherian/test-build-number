@@ -27,7 +27,6 @@ jobs:
             echo ${{ secrets.SECRET_LIST }} > prop-temp.txt
             cat  prop-temp.txt
             envsubst < prop-temp.txt > prop.txt
-            env
           shell: bash
         - uses: actions/upload-artifact@v4
           with:
