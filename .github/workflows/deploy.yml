@@ -24,7 +24,7 @@ jobs:
             while IFS= read -r line; do
               export "$line"
             done < "$file_name"
-            echo ${ secrets.SECRET_LIST }} > prop-temp.txt
+            echo ${{ secrets.SECRET_LIST }} > prop-temp.txt
             envsubst < prop-temp.txt > prop.txt
             env
           shell: bash
