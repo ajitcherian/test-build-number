@@ -19,12 +19,7 @@ jobs:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
             echo $ALLSECRETS > file.json
-            # echo ${{ vars.SECRET_LIST }} >> file.txt
-            # file_name="file.txt"
-            # while IFS= read -r line; do
-            #  echo "this is $line"
-            #  echo $ALLSECRETS | jq .$line
-            # done < "$file_name"
+
           shell: bash
         - uses: actions/upload-artifact@v4
           with:
