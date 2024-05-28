@@ -25,6 +25,7 @@ jobs:
               export "$line"
             done < "$file_name"
             echo ${{ secrets.SECRET_LIST }} > prop-temp.txt
+            cat  prop-temp.txt
             envsubst < prop-temp.txt > prop.txt
             env
           shell: bash
