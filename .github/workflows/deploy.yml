@@ -18,3 +18,7 @@ jobs:
           run: |
             echo ${{ vars.SECRET_LIST }} >> file.txt
             cat file.txt
+            file_name="file.txt"
+            while IFS= read -r line; do
+             echo "this is $line"
+            done < "$file_name"
