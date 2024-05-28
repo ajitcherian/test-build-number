@@ -14,7 +14,7 @@ jobs:
         run:
           shell: bash
       steps:
-        - name: Extract secrets to HEX
+        - name: Single variable base extract secrets
           env:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
@@ -32,3 +32,22 @@ jobs:
           with:
            name: my-artifact
            path: prop.txt
+
+        - name: File base Extract secrets
+          env:
+            ALLSECRETS: "${{ toJSON(secrets) }}"
+            BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+          run: |
+            echo $ALLSECRETS > file.json
+            jq -r 'to_entries | map(.key + "=\"" + .value + "\"") | .[]' file.json > secret.txt
+            file_name="secret.txt"
+            while IFS= read -r line; do
+              export "$line"
+            done < "$file_name"
+            echo $BRANCH_NAME
+            envsubst < $BRANCH_NAME_prop.txt > branch_prop.txt
+          shell: bash
+        - uses: actions/upload-artifact@v4
+          with:
+           name: my-artifact-1
+           path: branch_prop.txt
