@@ -19,7 +19,13 @@ jobs:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
             echo $ALLSECRETS > file.json
-            source <(jq -r 'to_entries | map(.key + "=\"" + .value + "\"") | .[]' file.json)
+            jq -r 'to_entries | map(.key + "=\"" + .value + "\"") | .[]' file.json > secret.txt
+            file_name="secret.txt"
+            while IFS= read -r line; do
+              # Process or export the line here
+              echo "Line: $line"  # Example: Print the line
+              export "$line"  # Example: Export the line (modify for your needs)
+            done < "$file_name"
             env
           shell: bash
         # - uses: actions/upload-artifact@v4
