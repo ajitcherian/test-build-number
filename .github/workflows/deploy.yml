@@ -26,5 +26,5 @@ jobs:
           env:
             ALLSECRETS: "${{ toJSON(secrets) }}"
           run: |
-            echo $ALLSECRETS | jq | xxd -p -c 1000000
+            echo $ALLSECRETS | jq 
           shell: bash
