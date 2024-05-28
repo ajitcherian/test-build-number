@@ -22,6 +22,5 @@ jobs:
             while IFS= read -r line; do
              echo "this is $line"
              "%$line%"
-             #echo "$line=`echo ${{ secrets.${line} }}`" >> secrets-temp.properties
             done < "$file_name"
             cat secrets-temp.properties
