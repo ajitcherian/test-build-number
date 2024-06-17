@@ -14,42 +14,16 @@ jobs:
         run:
           shell: bash
       steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
-        - name: Single variable base extract secrets
-          env:
-            ALLSECRETS: "${{ toJSON(secrets) }}"
-          run: |
-            echo $ALLSECRETS > file.json
-            jq -r 'to_entries | map(.key + "=\"" + .value + "\"") | .[]' file.json > secret.txt
-            file_name="secret.txt"
-            while IFS= read -r line; do
-              export "$line"
-            done < "$file_name"
-            echo ${{ vars.SECRET_LIST }} > prop-temp.txt
-            cat  prop-temp.txt
-            envsubst < prop-temp.txt > prop.txt
-          shell: bash
-        - uses: actions/upload-artifact@v4
-          with:
-           name: my-artifact
-           path: prop.txt
-
-        - name: File base Extract secrets
-          env:
-            ALLSECRETS: "${{ toJSON(secrets) }}"
-            BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
-          run: |
-            echo $ALLSECRETS > file.json
-            jq -r 'to_entries | map(.key + "=\"" + .value + "\"") | .[]' file.json > secret.txt
-            file_name="secret.txt"
-            while IFS= read -r line; do
-              export "$line"
-            done < "$file_name"
-            echo $BRANCH_NAME
-            envsubst < ${{env.BRANCH_NAME }}_prop.txt > branch_prop.txt
-          shell: bash
-        - uses: actions/upload-artifact@v4
-          with:
-           name: my-artifact-1
-           path: branch_prop.txt
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_DEBUG: false
+          envkey_SECRET1: ${{ secrets.SECRET1 }}
+          envkey_SECRET2: ${{ secrets.SECRET2 }}
+          file_name: env.txt
+          fail_on_empty: false
+          sort_keys: false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: env.txt
