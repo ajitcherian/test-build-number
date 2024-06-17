@@ -18,8 +18,8 @@ jobs:
         uses: SpicyPizza/create-envfile@v2.0
         with:
           envkey_DEBUG: false
-          envkey_SECRET1: ${{ secrets.SECRET1 }}
-          envkey_SECRET2: ${{ secrets.SECRET2 }}
+          envkey_SECRET_WITH: ${{ secrets.SECRET_WITH }}
+          envkey_SECRET_WITHOUT: ${{ secrets.SECRET_WITHOUT }}
           file_name: env.txt
           fail_on_empty: false
           sort_keys: false
