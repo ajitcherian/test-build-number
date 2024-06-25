@@ -86,15 +86,15 @@ on:
         - LYNXPREVIEW
         - LYNXQA
       deploy-environment:
-        type: choice
+        type: environment
         description: 'Choose environment'
-        options:
-          - qa
-          - alpha
-          - perf
-          - preview
-        required: true
-        default: 'qa'
+        # options:
+        #   - qa
+        #   - alpha
+        #   - perf
+        #   - preview
+        # required: true
+        # default: 'qa'
       only-copy-property-file:
         type: choice
         required: true
